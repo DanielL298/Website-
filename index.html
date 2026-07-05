@@ -1,263 +1,221 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PixelForge Studio — Game Dev Outsourcing</title>
-  <link rel="stylesheet" href="styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
   <!-- NAV -->
-  <nav class="nav">
-    <div class="nav__logo">PIXELFORGE<span class="dot">.</span></div>
-    <ul class="nav__links">
-      <li><a href="#services">Services</a></li>
-      <li><a href="#process">Process</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-    <button class="btn btn--outline nav__cta" onclick="scrollToContact()">Get a Quote</button>
-    <button class="nav__burger" id="burger" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
-  </nav>
-
-  <!-- MOBILE MENU -->
-  <div class="mobile-menu" id="mobileMenu">
-    <ul>
-      <li><a href="#services" onclick="closeMenu()">Services</a></li>
-      <li><a href="#process" onclick="closeMenu()">Process</a></li>
-      <li><a href="#contact" onclick="closeMenu()">Contact</a></li>
-      <li><a href="#contact" class="mobile-cta" onclick="closeMenu()">Get a Quote</a></li>
-    </ul>
-  </div>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a href="#" class="logo">
+    <img src="images/logo.png" alt="Crwcible Studios Logo">
+  
+</a>
+      
+      <nav class="nav">
+        <a href="#work">Work</a>
+        <a href="#case-studies">Case Studies</a>
+        <a href="#clients">Clients</a>
+        <a href="#team">Team</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero__tag"><span class="tag-dot"></span>Game Dev Outsourcing Studio</div>
-    <h1 class="hero__headline">
-      We build the<br />
-      <span class="hero__highlight">worlds</span> you<br />
-      imagine.
-    </h1>
-    <p class="hero__sub">
-      Experienced game development teams on demand. From concept to ship — art, engineering, and design outsourcing for studios of all sizes.
-    </p>
-    <div class="hero__actions">
-      <button class="btn btn--primary" onclick="scrollToContact()">Start a Project</button>
-      <a href="#services" class="btn btn--ghost">See Services ↓</a>
+    <div class="wrap">
+      
+      <h1>"Motto/ nice quote" Maybe a logo</h1>
+      <p class="hero-sub">" what we do " </p>
     </div>
-    <div class="hero__stats">
-      <div class="stat">
-        <span class="stat__num" data-target="120">0</span><span class="stat__plus">+</span>
-        <span class="stat__label">Projects Shipped</span>
-      </div>
-      <div class="stat__divider"></div>
-      <div class="stat">
-        <span class="stat__num" data-target="40">0</span><span class="stat__plus">+</span>
-        <span class="stat__label">Studios Served</span>
-      </div>
-      <div class="stat__divider"></div>
-      <div class="stat">
-        <span class="stat__num" data-target="8">0</span><span class="stat__plus"></span>
-        <span class="stat__label">Years Experience</span>
+  </section>
+
+  <!-- Featured work carousselle -->
+
+  <section class="featured" id="work">
+    <div class="featured-track" id="featured-track">
+      <article class="featured-slide">
+        <div class="card-media placeholder featured-media">Image 1</div>
+        <div class="featured-caption">
+          <h3>1</h3>
+          <p> description</p>
+        </div>
+      </article>
+      <article class="featured-slide">
+        <div class="card-media placeholder featured-media">Image 2</div>
+        <div class="featured-caption">
+          <h3>2</h3>
+          <p> description </p>
+        </div>
+      </article>
+      <article class="featured-slide">
+        <div class="card-media placeholder featured-media">Image 3</div>
+        <div class="featured-caption">
+          <h3>3</h3>
+          <p>description </p>
+        </div>
+      </article>
+      <article class="featured-slide">
+        <div class="card-media placeholder featured-media">Image 4</div>
+        <div class="featured-caption">
+          <h3>4</h3>
+          <p>description </p>
+        </div>
+      </article>
+      <article class="featured-slide">
+        <div class="card-media placeholder featured-media">Image 5</div>
+        <div class="featured-caption">
+          <h3>5</h3>
+          <p>description</p>
+        </div>
+      </article>
+    </div>
+
+    <div class="featured-controls" data-featured-controls="featured-track">
+      <button class="ctrl prev" aria-label="Previous">&#8592;</button>
+      <div class="featured-dots"></div>
+      <button class="ctrl next" aria-label="Next">&#8594;</button>
+    </div>
+  </section>
+ <!-- Tech stack-->
+  <section class="section" id="clients">
+    <div class="wrap">
+      <h2>Technology/ softwares </h2>
+      <div class="logo-grid">
+        <div class="logo-item">LOGO</div>
+        <div class="logo-item">LOGO</div>
+        <div class="logo-item">LOGO</div>
+        <div class="logo-item">LOGO</div>
+        <div class="logo-item">LOGO</div>
+        <div class="logo-item">LOGO</div>
       </div>
     </div>
   </section>
 
-  <!-- MARQUEE -->
-  <div class="marquee" aria-hidden="true">
-    <div class="marquee__track">
-      <span>Unity</span><span>·</span>
-      <span>Unreal Engine</span><span>·</span>
-      <span>Godot</span><span>·</span>
-      <span>3D Modelling</span><span>·</span>
-      <span>Character Art</span><span>·</span>
-      <span>Level Design</span><span>·</span>
-      <span>VFX</span><span>·</span>
-      <span>UI/UX</span><span>·</span>
-      <span>Animation</span><span>·</span>
-      <span>QA Testing</span><span>·</span>
-      <span>Unity</span><span>·</span>
-      <span>Unreal Engine</span><span>·</span>
-      <span>Godot</span><span>·</span>
-      <span>3D Modelling</span><span>·</span>
-      <span>Character Art</span><span>·</span>
-      <span>Level Design</span><span>·</span>
-      <span>VFX</span><span>·</span>
-      <span>UI/UX</span><span>·</span>
-      <span>Animation</span><span>·</span>
-      <span>QA Testing</span><span>·</span>
+  <!--  WORK smaller images -->
+  <section class="section alt" id="all-work">
+    <div class="wrap section-head">
+      <h2>Work </h2>
     </div>
-  </div>
-
-  <!-- SERVICES -->
-  <section class="services" id="services">
-    <div class="section-label">/ What We Do</div>
-    <h2 class="section-title">Full-spectrum<br/>game dev support.</h2>
-    <div class="services__grid">
-
-      <div class="service-card" data-index="01">
-        <div class="service-card__icon">◈</div>
-        <h3>Art & Concept</h3>
-        <p>Characters, environments, UI elements, and concept art that align with your visual direction and brand.</p>
-        <ul>
-          <li>Character design</li>
-          <li>Environment art</li>
-          <li>UI/UX design</li>
-          <li>Concept illustration</li>
-        </ul>
-      </div>
-
-      <div class="service-card" data-index="02">
-        <div class="service-card__icon">⬡</div>
-        <h3>3D & Animation</h3>
-        <p>High-quality 3D assets and animations optimised for your target platform and engine.</p>
-        <ul>
-          <li>3D modelling & rigging</li>
-          <li>Character animation</li>
-          <li>Cutscene production</li>
-          <li>VFX & particles</li>
-        </ul>
-      </div>
-
-      <div class="service-card" data-index="03">
-        <div class="service-card__icon">⟨/⟩</div>
-        <h3>Engineering</h3>
-        <p>Experienced developers embedded into your pipeline. Unity, Unreal, Godot — we work in your stack.</p>
-        <ul>
-          <li>Gameplay programming</li>
-          <li>Systems & tools dev</li>
-          <li>Performance optimisation</li>
-          <li>Porting & platform work</li>
-        </ul>
-      </div>
-
-      <div class="service-card" data-index="04">
-        <div class="service-card__icon">◎</div>
-        <h3>QA & Testing</h3>
-        <p>Rigorous testing across platforms to catch bugs before your players do.</p>
-        <ul>
-          <li>Functional QA</li>
-          <li>Regression testing</li>
-          <li>Platform certification</li>
-          <li>Localisation QA</li>
-        </ul>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- PROCESS -->
-  <section class="process" id="process">
-    <div class="section-label">/ How It Works</div>
-    <h2 class="section-title">Simple, transparent<br/>from day one.</h2>
-    <div class="process__steps">
-      <div class="process__step">
-        <div class="step__num">01</div>
-        <div class="step__content">
-          <h3>Discovery Call</h3>
-          <p>We learn about your project, scope, timeline, and team. No fluff — just the right questions.</p>
-        </div>
-      </div>
-      <div class="process__line"></div>
-      <div class="process__step">
-        <div class="step__num">02</div>
-        <div class="step__content">
-          <h3>Proposal & Match</h3>
-          <p>We assemble the right specialists for your needs and send a clear proposal within 48 hours.</p>
-        </div>
-      </div>
-      <div class="process__line"></div>
-      <div class="process__step">
-        <div class="step__num">03</div>
-        <div class="step__content">
-          <h3>Onboard & Build</h3>
-          <p>Your team integrates with your pipeline. Regular check-ins, transparent progress, zero surprises.</p>
-        </div>
-      </div>
-      <div class="process__line"></div>
-      <div class="process__step">
-        <div class="step__num">04</div>
-        <div class="step__content">
-          <h3>Deliver & Support</h3>
-          <p>We ship on time and remain available for iterations, patches, and ongoing support.</p>
-        </div>
+    <div class="wrap">
+      <div class="work-grid">
+        <article class="work-item" data-images="Image 1 – view 1,Image 1 – view 2,Image 1 – view 3">
+          <div class="card-media placeholder">Image 1</div>
+          <h3>1</h3>
+          <p> description</p>
+        </article>
+        <article class="work-item" data-images="Image 2 – view 1,Image 2 – view 2,Image 2 – view 3">
+          <div class="card-media placeholder">Image 2</div>
+          <h3>2</h3>
+          <p> description </p>
+        </article>
+        <article class="work-item" data-images="Image 3 – view 1,Image 3 – view 2,Image 3 – view 3">
+          <div class="card-media placeholder">Image 3</div>
+          <h3>3</h3>
+          <p>description </p>
+        </article>
+        <article class="work-item" data-images="Image 4 – view 1,Image 4 – view 2,Image 4 – view 3">
+          <div class="card-media placeholder">Image 4</div>
+          <h3>4</h3>
+          <p>description </p>
+        </article>
+        <article class="work-item" data-images="Image 5 – view 1,Image 5 – view 2,Image 5 – view 3">
+          <div class="card-media placeholder">Image 5</div>
+          <h3>5</h3>
+          <p>description</p>
+        </article>
       </div>
     </div>
   </section>
 
-  <!-- CONTACT -->
-  <section class="contact" id="contact">
-    <div class="contact__inner">
-      <div class="contact__copy">
-        <div class="section-label">/ Get In Touch</div>
-        <h2 class="section-title">Let's build<br/>something great.</h2>
-        <p>Tell us about your project and we'll get back to you within 24 hours.</p>
-        <div class="contact__details">
-          <div class="contact__detail">
-            <span class="detail-label">Email</span>
-            <a href="mailto:hello@pixelforge.studio">hello@pixelforge.studio</a>
-          </div>
-          <div class="contact__detail">
-            <span class="detail-label">Response time</span>
-            <span>Within 24 hours</span>
-          </div>
-        </div>
+  <!-- Client Logos -->
+  <section class="section " id="clients">
+    <div class="wrap">
+      <h2>Clients ????</h2>
+      <div class="logo-grid">
+        <div class="logo-item">LOGO</div>
+        <div class="logo-item">LOGO</div>
+        <div class="logo-item">LOGO</div>
+        <div class="logo-item">LOGO</div>
+        <div class="logo-item">LOGO</div>
+        <div class="logo-item">LOGO</div>
       </div>
-      <form class="contact__form" id="contactForm" novalidate>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="name">Your Name</label>
-            <input type="text" id="name" name="name" placeholder="Jane Smith" required />
-          </div>
-          <div class="form-group">
-            <label for="company">Studio / Company</label>
-            <input type="text" id="company" name="company" placeholder="Indie Games Ltd" />
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="email">Email Address</label>
-          <input type="email" id="email" name="email" placeholder="jane@studio.com" required />
-        </div>
-        <div class="form-group">
-          <label for="service">Service Needed</label>
-          <select id="service" name="service">
-            <option value="">Select a service...</option>
-            <option>Art & Concept</option>
-            <option>3D & Animation</option>
-            <option>Engineering</option>
-            <option>QA & Testing</option>
-            <option>Multiple / Not sure yet</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="message">Tell us about your project</label>
-          <textarea id="message" name="message" rows="4" placeholder="Scope, timeline, platform..." required></textarea>
-        </div>
-        <button type="submit" class="btn btn--primary btn--full">Send Message →</button>
-        <div class="form-success" id="formSuccess">
-          ✓ Message sent! We'll be in touch within 24 hours.
-        </div>
-      </form>
     </div>
   </section>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="footer__inner">
-      <div class="footer__logo">PIXELFORGE<span class="dot">.</span></div>
-      <p class="footer__tagline">Game dev outsourcing, done right.</p>
-      <div class="footer__links">
-        <a href="#services">Services</a>
-        <a href="#process">Process</a>
-        <a href="#contact">Contact</a>
+  
+
+ 
+
+  <!-- TEAM SECTION -->
+  <section class="section" id="team">
+    <div class="wrap">
+      <h2>Team</h2>
+      <div class="team-grid">
+        <div class="team-member">
+          <div class="card-media placeholder square">Photo</div>
+          <h3>Charlie Jones/h3>
+          <p>"position"</p> 
+        </div>
+        <div class="team-member">
+          <div class="card-media placeholder square">Photo</div>
+          <h3>Josh Mcclure</h3>
+          <p> "position" </p>
+        </div>
+        <div class="team-member">
+          <div class="card-media placeholder square">Photo</div>
+          <h3>Daniel Lord</h3>
+          <p>"position" </p>
+        </div>
+       
       </div>
-      <p class="footer__copy">© 2026 PixelForge Studio. All rights reserved.</p>
+    </div>
+  </section>
+
+  <!-- Contact us section -->
+  <section class="section alt" id="contact">
+    <div class="wrap">
+      <div class="contact-info">
+        <h2>Get in touch</h2>
+        <p class="contact-lead">Have a project in mind? Reach out — we'd love to hear from you.</p>
+        <ul class="contact-details">
+          <li><span class="contact-label">Email</span><a href="mailto:hello@crwciblestudios.com">hello@crwciblestudios.com</a></li>
+          <li><span class="contact-label">Phone</span><a href="tel:+10000000000">+1 (000) 000-0000</a></li>
+          <li><span class="contact-label">Studio</span><span>City, Country</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <p>&copy; 2026 CrwcibleStudios.</p>
+     
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <!-- Work display -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" aria-label="Close" data-lightbox-close>&times;</button>
+    <div class="lightbox-content">
+      <div class="card-media placeholder lightbox-media">Image</div>
+      <div class="lightbox-caption">
+        <h3 class="lightbox-title"></h3>
+      </div>
+    </div>
+    <div class="lightbox-nav">
+      <button class="ctrl lightbox-prev" aria-label="Previous image">&#8592;</button>
+      <div class="featured-dots lightbox-dots"></div>
+      <button class="ctrl lightbox-next" aria-label="Next image">&#8594;</button>
+    </div>
+  </div>
+
+  <script src="index.js"></script>
 </body>
 </html>
