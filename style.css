@@ -455,6 +455,17 @@ img.card-media,
   color: var(--color-text-muted);
   font-size: 0.8rem;
   letter-spacing: 0.05em;
+  overflow: hidden;
+}
+
+/* Logos are shown whole (not cropped) — swap in real logo files any size,
+   they'll scale down to fit the box. */
+.logo-item img {
+  max-width: 70%;
+  max-height: 70%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
 }
 
 /* 

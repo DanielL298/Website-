@@ -87,11 +87,13 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
 
   let currentImages = [];
   let currentIndex = 0;
+  let currentTitle = '';
 
   const renderSlide = () => {
-    const label = currentImages[currentIndex] || '';
-    media.textContent = label;
-    titleEl.textContent = label;
+    const src = currentImages[currentIndex] || '';
+    media.src = src;
+    media.alt = currentTitle;
+    titleEl.textContent = currentTitle;
     Array.from(dotsWrap.children).forEach((dot, i) => {
       dot.classList.toggle('active', i === currentIndex);
     });
@@ -123,9 +125,10 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
     renderSlide();
   };
 
-  const openLightbox = (images, startIndex) => {
+  const openLightbox = (images, startIndex, title) => {
     currentImages = images;
     currentIndex = startIndex;
+    currentTitle = title || '';
     navWrap.style.display = currentImages.length > 1 ? 'flex' : 'none';
     buildDots();
     renderSlide();
@@ -147,10 +150,11 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
     const raw = item.getAttribute('data-images');
     const images = raw
       ? raw.split(',').map((s) => s.trim()).filter(Boolean)
-      : [trigger.textContent.trim()];
+      : [trigger.getAttribute('src')];
+    const title = item.querySelector('h3')?.textContent.trim() || '';
 
     trigger.style.cursor = 'zoom-in';
-    trigger.addEventListener('click', () => openLightbox(images, 0));
+    trigger.addEventListener('click', () => openLightbox(images, 0, title));
   });
 
   nextBtn.addEventListener('click', showNext);
