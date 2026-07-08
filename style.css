@@ -452,7 +452,14 @@ img.card-media,
 .ctrl:hover { background: transparent; opacity: 0.65; }
 .ctrl:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 
-/* 
+/*
+  Button cunstomisation for featured Slider
+  */
+.prev {
+  transform: scaleX(-1);
+}
+
+
    LOGO GRID
  */
 .logo-grid {
