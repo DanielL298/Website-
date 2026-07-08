@@ -88,10 +88,16 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
 .nav a {
   font-size: 0.9rem;
   color: var(--color-text-muted);
-  transition: color 0.15s ease;
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  transition: color 0.15s ease, border-color 0.15s ease;
 }
 
-.nav a:hover, .nav a:focus-visible { color: var(--color-text); }
+.nav a:hover, .nav a:focus-visible {
+  color: var(--color-text);
+  border-color: #e53935;
+}
 
 /* 
    HERO
@@ -129,13 +135,20 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
 }
 
 .section.alt {
-  background: linear-gradient(
-    to bottom,
-    var(--color-bg) 0,
-    var(--color-bg-alt) clamp(30px, 4vw, 70px),
-    var(--color-bg-alt) calc(100% - clamp(30px, 4vw, 70px)),
-    var(--color-bg) 100%
-  );
+  background-color: var(--color-bg-alt);
+  background-image:
+    linear-gradient(
+      to bottom,
+      var(--color-bg) 0,
+      var(--color-bg-alt) clamp(30px, 4vw, 70px),
+      var(--color-bg-alt) calc(100% - clamp(30px, 4vw, 70px)),
+      var(--color-bg) 100%
+    ),
+    url('images/contours.webp');
+  background-size: 100% 100%, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+  background-blend-mode: normal, screen;
 }
 
 .section h2 {
@@ -160,13 +173,20 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
   height: 100vh;
   min-height: 480px;
   overflow: hidden;
-  background: linear-gradient(
-    to bottom,
-    var(--color-bg) 0,
-    var(--color-bg-alt) clamp(30px, 4vw, 70px),
-    var(--color-bg-alt) calc(100% - clamp(30px, 4vw, 70px)),
-    var(--color-bg) 100%
-  );
+  background-color: var(--color-bg-alt);
+  background-image:
+    linear-gradient(
+      to bottom,
+      var(--color-bg) 0,
+      var(--color-bg-alt) clamp(30px, 4vw, 70px),
+      var(--color-bg-alt) calc(100% - clamp(30px, 4vw, 70px)),
+      var(--color-bg) 100%
+    ),
+    url('images/contours.webp');
+  background-size: 100% 100%, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+  background-blend-mode: normal, screen;
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.14),
     inset 0 0 90px rgba(255, 255, 255, 0.10);
