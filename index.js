@@ -10,7 +10,7 @@
   const header = document.querySelector('.site-header');
   if (!header) return;
 
-  const SHOW_THRESHOLD = 10; // px scrolled before header appears
+  const SHOW_THRESHOLD = -10; // px scrolled before header appears
 
   const updateHeader = () => {
     header.classList.toggle('is-visible', window.scrollY > SHOW_THRESHOLD);
