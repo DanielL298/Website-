@@ -1,6 +1,25 @@
 // Full-screen "featured" slider: one slide fills the screen, auto-plays,
 // and can be advanced manually with the prev/next buttons or dots.
 
+// -------------------------------------------------------------------
+// HEADER VISIBILITY
+// Header stays hidden while at the very top of the page, and slides
+// in as soon as the user scrolls down at all.
+// -------------------------------------------------------------------
+(() => {
+  const header = document.querySelector('.site-header');
+  if (!header) return;
+
+  const SHOW_THRESHOLD = 10; // px scrolled before header appears
+
+  const updateHeader = () => {
+    header.classList.toggle('is-visible', window.scrollY > SHOW_THRESHOLD);
+  };
+
+  updateHeader(); // set correct state on load (e.g. reload mid-page)
+  window.addEventListener('scroll', updateHeader, { passive: true });
+})();
+
 document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
   const trackId = controls.getAttribute('data-featured-controls');
   const track = document.getElementById(trackId);
