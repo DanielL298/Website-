@@ -85,6 +85,70 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
 });
 
 // -------------------------------------------------------------------
+// EMBERS
+// Glowing particles that spark off the seam between Technology and
+// Work below it (the bottom edge of #tech) and rise/scatter up
+// through Technology into the hero-caption section above. Each ember follows a randomized 3-stage zigzag path
+// (rather than a straight line) for a chaotic, fire-like scatter.
+// Skips entirely if the user prefers reduced motion.
+// -------------------------------------------------------------------
+(() => {
+  const container = document.getElementById('embers');
+  if (!container) return;
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReducedMotion) return;
+
+  const EMBER_COUNT = 40;
+  const EASES = ['ease-in-out', 'ease-out', 'cubic-bezier(.3,.6,.7,.1)'];
+  const rand = (min, max) => Math.random() * (max - min) + min;
+  const frag = document.createDocumentFragment();
+
+  for (let i = 0; i < EMBER_COUNT; i++) {
+    const ember = document.createElement('span');
+    ember.className = 'ember';
+
+    const size = rand(1.5, 6.5).toFixed(1); // varied spark sizes
+    const x = rand(0, 100).toFixed(1); // spawn position across the seam
+    const fall = rand(160, 420).toFixed(0); // how far it falls before fading out
+
+    // Three independent sideways offsets create a zigzag path instead
+    // of a straight drift, with each ember free to swing a different
+    // direction/amount at each stage.
+    const drift1 = rand(-70, 70).toFixed(0);
+    const drift2 = rand(-110, 110).toFixed(0);
+    const drift3 = rand(-150, 150).toFixed(0);
+
+    const spin1 = rand(-90, 90).toFixed(0);
+    const spin2 = rand(-120, 120).toFixed(0);
+    const spin3 = rand(-160, 160).toFixed(0);
+
+    const duration = rand(3.5, 11).toFixed(1); // varied fall speeds
+    const delay = -rand(0, 11).toFixed(1); // negative = staggered/random start
+    const peakOpacity = rand(0.3, 0.85).toFixed(2);
+    const ease = EASES[Math.floor(Math.random() * EASES.length)];
+
+    ember.style.setProperty('--size', `${size}px`);
+    ember.style.setProperty('--x', `${x}%`);
+    ember.style.setProperty('--fall', `${fall}px`);
+    ember.style.setProperty('--drift1', `${drift1}px`);
+    ember.style.setProperty('--drift2', `${drift2}px`);
+    ember.style.setProperty('--drift3', `${drift3}px`);
+    ember.style.setProperty('--spin1', `${spin1}deg`);
+    ember.style.setProperty('--spin2', `${spin2}deg`);
+    ember.style.setProperty('--spin3', `${spin3}deg`);
+    ember.style.setProperty('--duration', `${duration}s`);
+    ember.style.setProperty('--delay', `${delay}s`);
+    ember.style.setProperty('--peak-opacity', peakOpacity);
+    ember.style.setProperty('--ease', ease);
+
+    frag.appendChild(ember);
+  }
+
+  container.appendChild(frag);
+})();
+
+// -------------------------------------------------------------------
 // WORK GRID LIGHTBOX
 // Clicking a work item enlarges its image. Each item can carry its own
 // small set of extra images (via data-images on the .work-item), which

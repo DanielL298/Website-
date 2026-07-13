@@ -135,6 +135,97 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
   padding: clamp(40px, 6vw, 80px) 0;
 }
 
+/*
+   EMBERS — glowing particles that originate right at the seam between
+   Technology and Work below it (i.e. the bottom edge of #tech), then
+   drift up and fade as they rise through Technology into the hero/quote
+   section above — as if sparking off that seam and floating upward.
+   Particles are generated in JS (randomized size/speed/position/path)
+   and animated purely with CSS for performance. Each ember follows a
+   3-stage zigzag path (drift1 -> drift2 -> drift3) instead of a
+   straight line, plus randomized rotation, for a chaotic scatter
+   rather than a uniform rise.
+
+   Note: unlike a normal contained effect, #tech deliberately does NOT
+   clip overflow, so embers are free to travel above its own box and
+   visually pass into the hero-caption/quote section that precedes it.
+ */
+#tech {
+  position: relative;
+}
+
+#tech > .wrap {
+  position: relative;
+  z-index: 1;
+}
+
+/* Soft glow strip marking the seam the embers spark off from */
+#tech::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 140px;
+  background: radial-gradient(
+    ellipse 60% 100% at 50% 100%,
+    rgba(255, 138, 61, 0.16),
+    rgba(255, 138, 61, 0) 75%
+  );
+  z-index: 0;
+  pointer-events: none;
+}
+
+.embers {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.ember {
+  position: absolute;
+  bottom: -16px;
+  left: var(--x);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffe3b0 0%, #ff8a3d 45%, rgba(255, 90, 20, 0) 75%);
+  box-shadow: 0 0 7px 1px rgba(255, 130, 40, 0.6);
+  opacity: 0;
+  animation: ember-rise var(--duration) var(--ease, ease-in-out) var(--delay) infinite;
+}
+
+@keyframes ember-rise {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(0.5);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--peak-opacity, 0.75);
+  }
+  30% {
+    transform: translate(var(--drift1), calc(var(--fall) * -0.22)) rotate(var(--spin1, 40deg)) scale(1);
+  }
+  55% {
+    opacity: calc(var(--peak-opacity, 0.75) * 0.85);
+    transform: translate(var(--drift2), calc(var(--fall) * -0.55)) rotate(var(--spin2, -30deg)) scale(0.75);
+  }
+  80% {
+    opacity: calc(var(--peak-opacity, 0.75) * 0.4);
+  }
+  100% {
+    transform: translate(var(--drift3), calc(var(--fall) * -1)) rotate(var(--spin3, 60deg)) scale(0.15);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .embers,
+  #tech::before { display: none; }
+}
+
 .eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -520,6 +611,32 @@ img.card-media,
   width: auto;
   height: auto;
   object-fit: contain;
+}
+
+/* Plain variant — no grid lines, no tile backgrounds. Just drop in
+   transparent (PNG/SVG) logo files and they'll sit directly on the
+   page background, evenly spaced. */
+.logo-grid--plain {
+  background: none;
+  border: none;
+  gap: clamp(24px, 4vw, 56px);
+}
+
+.logo-grid--plain .logo-item {
+  background: none;
+  aspect-ratio: auto;
+  height: 64px;
+}
+
+.logo-grid--plain .logo-item img {
+  max-width: 85%;
+  max-height: 100%;
+  opacity: 0.85;
+  transition: opacity 0.15s ease;
+}
+
+.logo-grid--plain .logo-item img:hover {
+  opacity: 1;
 }
 
 /* 
