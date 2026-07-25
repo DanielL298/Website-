@@ -556,27 +556,48 @@ img.card-media,
    SHARED CONTROLS (buttons used by featured slider)
  */
 .ctrl {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border: none;
-  border-radius: 0;
-  background: rgba(219, 207, 207, 0.92);
+  border-radius: 50%;
+  background: transparent;
   cursor: pointer;
-  font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.15s ease;
+  color: var(--color-text-muted);
+  padding: 0;
+  transition: color 0.25s ease, filter 0.25s ease, transform 0.15s ease;
 }
 
-.ctrl:hover { background: transparent; opacity: 0.65; }
-.ctrl:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.ctrl svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: filter 0.25s ease;
+}
 
-/*
-  Button cunstomisation for featured Slider
-  */
-.prev {
-  transform: scaleX(-1);
+/* Ember-orange glow flare on hover/focus — matches the .ember particle
+   colour (#ff8a3d) instead of a solid filled button, so the controls
+   read as "sparking" rather than boxy UI chrome. */
+.ctrl:hover,
+.ctrl:focus-visible {
+  color: #ffb17a;
+  filter:
+    drop-shadow(0 0 5px rgba(255, 138, 61, 0.85))
+    drop-shadow(0 0 14px rgba(255, 138, 61, 0.5));
+}
+
+.ctrl:hover { transform: translateY(-1px); }
+.ctrl:active { transform: translateY(0) scale(0.92); }
+
+.ctrl:focus-visible {
+  outline: 2px solid rgba(255, 138, 61, 0.6);
+  outline-offset: 4px;
 }
 
 /*
