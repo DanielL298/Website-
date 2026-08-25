@@ -745,13 +745,30 @@ img.card-media2,
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: clamp(20px, 2.5vw, 36px);
-  margin-top: 32px;
+  margin-top: 12px;
 }
 
 /* Team members are now image-only (captions/descriptions are baked
    into the photos themselves), so drop the spacing that used to sit
    between the photo and the name/position text under it. */
 .team-member .card-media {
+  margin-bottom: 0;
+}
+
+/* 
+   TEAM GRID
+*/
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: clamp(20px, 2.5vw, 36px);
+  margin-top: 12px;
+}
+
+/* Team members are now image-only (captions/descriptions are baked
+   into the photos themselves), so drop the spacing that used to sit
+   between the photo and the name/position text under it. */
+.services-member .card-media {
   margin-bottom: 0;
 }
 
