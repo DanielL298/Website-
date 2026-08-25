@@ -414,6 +414,18 @@ img.card-media,
   display: block;
 }
 
+.card-media2.square { aspect-ratio: 1 / 1; }
+
+/* Once a placeholder div is swapped for a real <img class="card-media">,
+   this makes it fill the box and crop nicely instead of stretching. */
+img.card-media2,
+.lightbox-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
 .placeholder {
   background: var(--color-bg-alt);
   border: 1px solid var(--color-border);
