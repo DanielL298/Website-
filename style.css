@@ -31,6 +31,11 @@ body {
   background: var(--color-bg);
   line-height: 1.5;
   font-size: clamp(16px, 1vw, 18px); /* scales gently on huge screens */
+  /* Clips any stray horizontal overflow (e.g. an ember drifting past the
+     right edge — #tech intentionally doesn't clip so they can rise into
+     hero-caption) so the page never gains extra un-textured scroll space
+     past the edge of the contours background. */
+  overflow-x: hidden;
 }
 
 img { max-width: 100%; display: block; }
@@ -133,6 +138,13 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
  */
 .hero-caption {
   padding: clamp(40px, 6vw, 80px) 0;
+}
+
+.hero-motto {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
 }
 
 /*
@@ -660,6 +672,60 @@ img.card-media,
   opacity: 1;
 }
 
+/*
+   SERVICES GRID
+ */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: clamp(20px, 2.5vw, 36px);
+  margin-top: 32px;
+}
+
+.service-item {
+  padding: 24px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.service-item h3 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.service-item p {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/*
+   VALUES GRID
+ */
+.values-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: clamp(20px, 2.5vw, 36px);
+  margin-top: 32px;
+}
+
+.value-item {
+  padding: 24px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.value-item h3 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.value-item p {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
 /* 
    TEAM GRID
 */
@@ -670,16 +736,11 @@ img.card-media,
   margin-top: 32px;
 }
 
-.team-member h3 {
-  font-size: 1rem;
-  margin-top: 16px;
-  margin-bottom: 4px;
-}
-
-.team-member p {
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
-  margin: 0;
+/* Team members are now image-only (captions/descriptions are baked
+   into the photos themselves), so drop the spacing that used to sit
+   between the photo and the name/position text under it. */
+.team-member .card-media {
+  margin-bottom: 0;
 }
 
 /* 
