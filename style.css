@@ -3,7 +3,7 @@
  */
 :root {
   --color-bg: #0d0d0d;
-  --color-bg-alt: #1a1a1a;
+  --color-bg-alt: #000000;
   --color-text: #f4f4f2;
   --color-text-muted: #9a9a97;
   --color-border: #2c2c2a;
@@ -420,10 +420,10 @@ img.card-media,
    this makes it fill the box and crop nicely instead of stretching. */
 img.card-media2,
 .lightbox-media img {
-  width: 100%;
+  width: 150%;
   height: 100%;
-  object-fit: contain;
-  display: block;
+  object-fit: contain; 
+  display: block; 
 }
 
 .placeholder {
@@ -680,9 +680,9 @@ img.card-media2,
   transition: opacity 0.15s ease;
 }
 
-.logo-grid--plain .logo-item img:hover {
+/*.logo-grid--plain .logo-item img:hover {
   opacity: 1;
-}
+}/*
 
 /*
    SERVICES GRID
