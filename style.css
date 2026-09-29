@@ -438,34 +438,156 @@ img.card-media2,
   text-transform: uppercase;
 }
 
-/* 
-   ALL-WORK GRID
+/*
+   WORK STACKS (fanned images, click to open the lightbox)
  */
 .work-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: clamp(20px, 2.5vw, 36px);
-  margin-top: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: clamp(32px, 4vw, 72px);
+  max-width: 1100px;
+  margin: 32px auto 0;
+}
+
+.work-item {
+  position: relative;
+  text-align: center;
+}
+
+.work-stack {
+  position: relative;
+  z-index: 1;
+  aspect-ratio: 4 / 3;
+  cursor: zoom-in;
+}
+
+/* the front image (your real cover photo) */
+.work-stack .card-media {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 76%;
+  height: 76%;
+  margin: auto;
+  aspect-ratio: auto;
+  transition: transform 0.3s ease;
+}
+
+.work-stack:hover .card-media,
+.work-stack:focus-visible .card-media {
+  transform: scale(1.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .work-stack .card-media { transition: none; }
+  .work-stack:hover .card-media,
+  .work-stack:focus-visible .card-media { transform: none; }
+}
+
+/* the two fanned layers behind it (filled with the next two images by index.js) */
+.work-stack::before,
+.work-stack::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 76%;
+  height: 76%;
+  margin: auto;
+  background-color: #141414;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid #3a3a38;
+  border-radius: var(--radius);
+  filter: brightness(0.55);
+}
+
+.work-stack::before {
+  z-index: 0;
+  background-image: var(--back-1, none);
+  transform: rotate(-6deg) translateX(-14px);
+}
+
+.work-stack::after {
+  z-index: 1;
+  background-image: var(--back-2, none);
+  transform: rotate(4deg) translateX(12px);
+}
+
+/* mirror the fan on every second project */
+.work-item:nth-child(even) .work-stack::before { transform: rotate(5deg) translateX(14px); }
+.work-item:nth-child(even) .work-stack::after  { transform: rotate(-4deg) translateX(-12px); }
+
+.work-stack:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 6px;
 }
 
 .work-item h3 {
-  font-size: 1.05rem;
-  margin-bottom: 6px;
+  margin-top: 14px;
+  font-size: 1.15rem;
+  color: #fff;
 }
 
-.work-item p {
-  color: var(--color-text-muted);
+.work-count {
+  margin: 4px 0 0;
+  color: #fff;
   font-size: 0.9rem;
-  margin: 0;
 }
 
-.work-item .card-media {
-  cursor: zoom-in;
-  transition: opacity 0.15s ease;
+/*
+   WORK SECTION BACKGROUND
+   Spotlight: the contour texture is brightest behind the projects and
+   fades to the page colour toward every edge (no hard top/bottom cut)
+ */
+#all-work {
+  position: relative;
+  background-color: #0d0d0d;
+  background-image:
+    linear-gradient(to bottom, #0d0d0d 0, rgba(13, 13, 13, 0) 20%, rgba(13, 13, 13, 0) 80%, #0d0d0d 100%),
+    radial-gradient(ellipse 58% 60% at 50% 58%, rgba(13, 13, 13, 0) 0%, rgba(13, 13, 13, 0.35) 40%, rgba(13, 13, 13, 0.9) 80%, #0d0d0d 100%),
+    url('images/contours.webp');
+  background-size: 100% 100%, 100% 100%, cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-.work-item .card-media:hover {
-  opacity: 0.85;
+/*
+   SEAM GRAPHIC (placeholder)
+   Straddles the line between Technology and this section, half above
+   and half below, so it covers the join. Swap the text for an <img>
+   when the custom beam graphic exists. Change --seam-graphic-height
+   to resize it.
+ */
+.seam-graphic {
+  --seam-graphic-height: clamp(48px, 6vw, 96px);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--seam-graphic-height);
+  transform: translateY(-50%);
+  z-index: 2;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.seam-graphic img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#all-work > .wrap {
+  position: relative;
+  z-index: 1;
 }
 
 /* 
@@ -682,94 +804,259 @@ img.card-media2,
 
 /*.logo-grid--plain .logo-item img:hover {
   opacity: 1;
-}/*
+}*/
 
 /*
-   SERVICES GRID
+   SERVICE CARDS (2 x 2, full width, pop on hover)
  */
-.services-grid {
+.service-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: clamp(20px, 2.5vw, 36px);
-  margin-top: 32px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(20px, 2.5vw, 40px);
+  padding: 32px var(--gutter) 0;
 }
 
-.service-item {
-  padding: 24px;
-  border: 1px solid var(--color-border);
+.service-card {
+  position: relative;
+  background: #000;
+  border: 1px solid rgba(255, 60, 60, 0.45);
   border-radius: var(--radius);
+  box-shadow: 0 0 8px rgba(255, 40, 40, 0.2);
+  overflow: hidden;
+  transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
-.service-item h3 {
-  font-size: 1.1rem;
-  margin-bottom: 8px;
+.service-card:hover,
+.service-card:focus-visible {
+  transform: translateY(-8px) scale(1.02);
+  border-color: rgba(255, 90, 90, 0.9);
+  z-index: 2;
+  outline: none;
 }
 
-.service-item p {
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
+.service-media {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.service-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.service-card:hover .service-media img,
+.service-card:focus-visible .service-media img {
+  transform: scale(1.06);
+}
+
+.service-body {
+  padding: clamp(18px, 2vw, 28px);
+}
+
+.service-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.service-num {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #e03b34;
+}
+
+.service-body h3 {
+  font-size: 1.4rem;
+  color: #fff;
+}
+
+.service-body p {
   margin: 0;
+  color: #fff;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 720px) {
+  .service-cards { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-card,
+  .service-media img { transition: none; }
+  .service-card:hover,
+  .service-card:focus-visible { transform: none; }
 }
 
 /*
    VALUES GRID
  */
 .values-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: clamp(20px, 2.5vw, 36px);
   margin-top: 32px;
 }
 
 .value-item {
-  padding: 24px;
-  border: 1px solid var(--color-border);
+  width: 100%;
+  padding: clamp(24px, 3vw, 40px);
+  border: 1px solid rgba(255, 60, 60, 0.45);
   border-radius: var(--radius);
+  box-shadow: 0 0 8px rgba(255, 40, 40, 0.2);
+  animation: value-glow 5s ease-in-out infinite;
+}
+
+.value-item:nth-child(2) { animation-delay: -1.2s; }
+.value-item:nth-child(3) { animation-delay: -2.5s; }
+.value-item:nth-child(4) { animation-delay: -3.7s; }
+
+@keyframes value-glow {
+  0%, 100% {
+    border-color: rgba(255, 60, 60, 0.35);
+    box-shadow: 0 0 6px rgba(255, 40, 40, 0.15);
+  }
+  50% {
+    border-color: rgba(255, 60, 60, 0.55);
+    box-shadow: 0 0 14px rgba(255, 40, 40, 0.3);
+  }
 }
 
 .value-item h3 {
-  font-size: 1.1rem;
-  margin-bottom: 8px;
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  color: #ffffff;
 }
 
 .value-item p {
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
+  color: #ffffff;
+  font-size: 1rem;
   margin: 0;
 }
 
-/* 
-   TEAM GRID
-*/
-.team-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: clamp(20px, 2.5vw, 36px);
-  margin-top: 12px;
+@media (prefers-reduced-motion: reduce) {
+  .value-item { animation: none; }
 }
 
-/* Team members are now image-only (captions/descriptions are baked
-   into the photos themselves), so drop the spacing that used to sit
-   between the photo and the name/position text under it. */
-.team-member .card-media {
-  margin-bottom: 0;
+/*
+   TEAM CARDS (red box per member, photo breaks out on the left, no hover effects)
+ */
+.team-list {
+  --photo-w: clamp(150px, 16vw, 260px);
+  width: 60%;
+  margin: clamp(56px, 6vw, 80px) auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(64px, 7vw, 96px);
 }
 
-/* 
-   TEAM GRID
-*/
-.services-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: clamp(20px, 2.5vw, 36px);
-  margin-top: 12px;
+.team-card {
+  position: relative;
+  min-height: calc(var(--photo-w) * 1.25);
+  padding: clamp(20px, 2vw, 28px) clamp(20px, 2vw, 28px) clamp(20px, 2vw, 28px) calc(var(--photo-w) + 8px);
+  background: #a51514;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
 }
 
-/* Team members are now image-only (captions/descriptions are baked
-   into the photos themselves), so drop the spacing that used to sit
-   between the photo and the name/position text under it. */
-.services-member .card-media {
-  margin-bottom: 0;
+.team-photo {
+  position: absolute;
+  top: -28px;
+  left: -24px;
+  width: var(--photo-w);
+  aspect-ratio: 10 / 13;
+  object-fit: cover;
+  border-radius: var(--radius);
+  background: #7d0f0e;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.team-name {
+  font-size: clamp(1.6rem, 2.4vw, 2.4rem);
+  color: #fff;
+}
+
+.team-role {
+  margin: 6px 0 14px;
+  color: #f5c4c3;
+  font-size: 0.95rem;
+}
+
+.team-bio {
+  margin: 0 0 16px;
+  max-width: 60ch;
+  color: #fff;
+  line-height: 1.6;
+}
+
+.team-tags {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.team-tags li {
+  background: #7d0f0e;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 3px 10px;
+  border-radius: var(--radius);
+}
+
+.team-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid #fff;
+  border-radius: var(--radius);
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.team-link svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* keyboard focus only (no hover effects) */
+.team-link:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+/* Phones: one column, photo still pokes out of the top-left corner */
+@media (max-width: 720px) {
+  .team-list {
+    width: calc(100% - 2 * var(--gutter));
+    gap: 80px;
+  }
+
+  .team-card {
+    display: block;
+    min-height: 0;
+    padding: 20px;
+  }
+
+  .team-photo {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 150px;
+    margin: -48px 0 16px -6px;
+  }
 }
 
 /* 

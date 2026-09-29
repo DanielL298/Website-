@@ -225,19 +225,39 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
   };
 
   items.forEach((item) => {
-    const trigger = item.querySelector('.card-media');
-    if (!trigger) return;
+    const cover = item.querySelector('.card-media');
+    if (!cover) return;
 
-    // Extra images live only in data-images — not shown on the grid itself,
-    // only revealed once the lightbox is open.
+    // The whole fanned stack is clickable (falls back to the cover image).
+    const trigger = item.querySelector('.work-stack') || cover;
+
+    // All images for this project live in data-images; they are only
+    // revealed once the lightbox is open.
     const raw = item.getAttribute('data-images');
     const images = raw
       ? raw.split(',').map((s) => s.trim()).filter(Boolean)
-      : [trigger.getAttribute('src')];
+      : [cover.getAttribute('src')];
     const title = item.querySelector('h3')?.textContent.trim() || '';
 
-    trigger.style.cursor = 'zoom-in';
-    trigger.addEventListener('click', () => openLightbox(images, 0, title));
+    // Image count under the title, worked out automatically.
+    const countEl = item.querySelector('.work-count');
+    if (countEl) {
+      countEl.textContent = `${images.length} image${images.length === 1 ? '' : 's'}`;
+    }
+
+    // Fill the two fanned layers behind the cover with the next two images.
+    const toUrl = (src) => `url("${new URL(src, document.baseURI).href}")`;
+    if (images[1]) trigger.style.setProperty('--back-1', toUrl(images[1]));
+    if (images[2]) trigger.style.setProperty('--back-2', toUrl(images[2]));
+
+    const open = () => openLightbox(images, 0, title);
+    trigger.addEventListener('click', open);
+    trigger.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        open();
+      }
+    });
   });
 
   nextBtn.addEventListener('click', showNext);
