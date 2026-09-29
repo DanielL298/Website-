@@ -593,7 +593,22 @@ img.card-media2,
 
 .seam-graphic.has-image span { display: none; }
 
+/* BEAM DIVIDER */
+.beam-divider {
+  width: 100%;
+  height: clamp(55px, 6vw, 90px);
+  overflow: hidden;
+  line-height: 0;
+  margin: 0;
+  padding: 0;
+}
 
+.beam-divider img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
 
 #all-work > .wrap {
   position: relative;
