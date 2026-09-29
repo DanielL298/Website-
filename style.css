@@ -552,22 +552,34 @@ img.card-media2,
 }
 
 /*
-   SEAM GRAPHIC (placeholder)
-   Straddles the line between Technology and this section, half above
-   and half below, so it covers the join. Swap the text for an <img>
-   when the custom beam graphic exists. Change --seam-graphic-height
-   to resize it.
+   SEAM GRAPHIC
+   Sits just below the line between Technology and this section.
+   Save the beam as images/seam-beam.png and it replaces the dashed
+   placeholder automatically (its own proportions are kept).
+     --seam-graphic-offset : push it further down (e.g. 20px)
+     --seam-graphic-width  : make it narrower than the full page (e.g. 80%)
  */
 .seam-graphic {
-  --seam-graphic-height: clamp(48px, 6vw, 96px);
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  height: var(--seam-graphic-height);
-  transform: translateY(-50%);
+  width: 100%;
+  height: clamp(55px, 7vw, 100px);
   z-index: 2;
   pointer-events: none;
+  overflow: hidden;
+}
+
+.seam-graphic img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: fill;
+}
+
+/* placeholder look, only while no image has loaded */
+.seam-graphic:not(.has-image) {
+  height: clamp(48px, 6vw, 96px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -579,11 +591,9 @@ img.card-media2,
   text-transform: uppercase;
 }
 
-.seam-graphic img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+.seam-graphic.has-image span { display: none; }
+
+
 
 #all-work > .wrap {
   position: relative;

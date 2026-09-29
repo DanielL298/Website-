@@ -167,11 +167,12 @@
 
   <!-- WORK: click a stack to open the gallery -->
   <section class="section" id="all-work">
-    <!-- SEAM GRAPHIC PLACEHOLDER: sits across the line between Technology and this section.
-         When the custom graphic is ready, replace the <span> with:
-         <img src="images/seam-beam.png" alt=""> -->
+    <!-- SEAM GRAPHIC -->
     <div class="seam-graphic" aria-hidden="true">
       <span>Custom beam graphic goes here</span>
+      <img src="images/seam-beam.png" alt=""
+           onload="this.parentElement.classList.add('has-image')"
+           onerror="this.remove()">
     </div>
 
     <div class="wrap">
