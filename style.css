@@ -867,7 +867,7 @@ img.card-media2,
 .service-media img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain; /* whole image shows inside the box, no cropping */
   transition: transform 0.5s ease;
 }
 
@@ -988,16 +988,27 @@ img.card-media2,
   align-items: center;
 }
 
+/* The frame — keeps its size and clips the photo inside it */
 .team-photo {
   position: absolute;
   top: -28px;
   left: -24px;
   width: var(--photo-w);
   aspect-ratio: 10 / 13;
-  object-fit: cover;
+  overflow: hidden;
   border-radius: var(--radius);
   background: #7d0f0e;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* The photo — set --zoom / --focus on a .team-photo to crop in closer */
+.team-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--focus, center);
+  transform: scale(var(--zoom, 1));
+  transform-origin: var(--focus, center);
 }
 
 .team-name {
@@ -1035,8 +1046,17 @@ img.card-media2,
   border-radius: var(--radius);
 }
 
+/* Email + ArtStation buttons sit side by side, wrapping on small screens */
+.team-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .team-link {
   display: inline-flex;
+  max-width: 100%;
+  overflow-wrap: anywhere; /* long email addresses can wrap on phones */
   align-items: center;
   gap: 8px;
   padding: 8px 14px;
@@ -1126,6 +1146,101 @@ img.card-media2,
   font-size: 0.75rem;
   color: var(--color-text-muted);
 }
+/*
+   CONTACT FORM (Web3Forms) — red-edged fields to match the service/value cards
+ */
+.contact-form {
+  margin-top: 40px;
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.contact-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.contact-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.contact-field input,
+.contact-field textarea {
+  width: 100%;
+  font: inherit;
+  color: var(--color-text);
+  background: #000;
+  border: 1px solid rgba(255, 60, 60, 0.45);
+  border-radius: var(--radius);
+  box-shadow: 0 0 8px rgba(255, 40, 40, 0.2);
+  padding: 12px 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contact-field textarea {
+  resize: vertical;
+  min-height: 150px;
+}
+
+.contact-field input:focus,
+.contact-field textarea:focus {
+  outline: none;
+  border-color: rgba(255, 90, 90, 0.95);
+  box-shadow: 0 0 14px rgba(255, 40, 40, 0.4);
+}
+
+.contact-submit {
+  align-self: flex-start;
+  font: inherit;
+  font-weight: 600;
+  color: #fff;
+  background: #a51514;
+  border: 1px solid #a51514;
+  border-radius: var(--radius);
+  padding: 12px 26px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contact-submit:hover,
+.contact-submit:focus-visible {
+  background: #c21c1a;
+  box-shadow: 0 0 14px rgba(255, 40, 40, 0.45);
+}
+
+.contact-submit:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.contact-submit:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.contact-botcheck { display: none; }
+
+.contact-status {
+  margin: 0;
+  min-height: 1.5em;
+  color: var(--color-text-muted);
+}
+
+.contact-status.is-success { color: #fff; font-size: 1.1rem; }
+.contact-status.is-error { color: #ff8a80; }
+
+/* Once sent, only the thank-you message is left showing */
+.contact-form.is-sent > :not(.contact-status) { display: none; }
+
+@media (max-width: 720px) {
+  .contact-form-row { grid-template-columns: 1fr; }
+}
+
 .site-footer {
   border-top: 1px solid var(--color-border);
   padding: 32px 0;

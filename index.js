@@ -275,3 +275,53 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
     if (e.key === 'ArrowLeft') showPrev();
   });
 })();
+
+// -------------------------------------------------------------------
+// CONTACT FORM (Web3Forms)
+// Sends the message without leaving the page, then swaps the form for
+// a thank-you line. If anything fails, visitors are pointed to the
+// studio email instead.
+// -------------------------------------------------------------------
+(() => {
+  const form = document.getElementById('contact-form');
+  if (!form) return;
+
+  const status = form.querySelector('.contact-status');
+  const button = form.querySelector('.contact-submit');
+  const FALLBACK = 'Sorry, that didn\'t send. Please email us at hello@crwciblestudios.com instead.';
+
+  const setStatus = (text, type) => {
+    status.textContent = text;
+    status.classList.remove('is-success', 'is-error');
+    if (type) status.classList.add(`is-${type}`);
+  };
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    button.disabled = true;
+    setStatus('Sending…');
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(Object.fromEntries(new FormData(form))),
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (response.ok) {
+        form.reset();
+        form.classList.add('is-sent');
+        setStatus('Thanks, your message has been sent. We\'ll get back to you soon.', 'success');
+      } else {
+        console.error('Contact form error:', data.message || response.status);
+        setStatus(FALLBACK, 'error');
+      }
+    } catch (err) {
+      console.error('Contact form error:', err);
+      setStatus(FALLBACK, 'error');
+    } finally {
+      button.disabled = false;
+    }
+  });
+})();
