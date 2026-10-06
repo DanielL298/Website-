@@ -546,7 +546,1375 @@ img.card-media2,
     linear-gradient(to bottom, #0d0d0d 0, rgba(13, 13, 13, 0) 20%, rgba(13, 13, 13, 0) 80%, #0d0d0d 100%),
     radial-gradient(ellipse 58% 60% at 50% 58%, rgba(13, 13, 13, 0) 0%, rgba(13, 13, 13, 0.35) 40%, rgba(13, 13, 13, 0.9) 80%, #0d0d0d 100%),
     url('images/contours.webp');
-  background-size: 100% 100%, 100% 100%, cover;
+  /* The two fade layers overhang the section by 1px top and bottom. Without
+     this, on scaled displays (e.g. Windows at 125-175%) they can round a
+     pixel short and leave a thin line of unfaded contours at the edge. */
+  background-size: 100% calc(100% + 2px), 100% calc(100% + 2px), cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/*
+   SEAM GRAPHIC
+   Sits just below the line between Technology and this section.
+   Save the beam as images/seam-beam.png and it replaces the dashed
+   placeholder automatically (its own proportions are kept).
+     --seam-graphic-offset : push it further down (e.g. 20px)
+     --seam-graphic-width  : make it narrower than the full page (e.g. 80%)
+ */
+.seam-graphic {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: clamp(55px, 7vw, 100px);
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.seam-graphic img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: fill;
+}
+
+/* placeholder look, only while no image has loaded */
+.seam-graphic:not(.has-image) {
+  height: clamp(48px, 6vw, 96px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.seam-graphic.has-image span { display: none; }
+
+/* BEAM DIVIDER */
+.beam-divider {
+  width: 100%;
+  height: clamp(55px, 6vw, 90px);
+  overflow: hidden;
+  line-height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.beam-divider img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+
+#all-work > .wrap {
+  position: relative;
+  z-index: 1;
+}
+
+/* 
+   LIGHTBOX
+ */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(24px, 6vw, 80px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1000;
+}
+
+.lightbox.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.lightbox-content {
+  max-width: 100%;
+  max-height: 100%;
+  width: min(1000px, 100%);
+}
+
+.lightbox-content img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--radius);
+}
+
+.lightbox-content .placeholder {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius);
+  font-size: 1.1rem;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 24px;
+  right: clamp(20px, 4vw, 64px);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-alt);
+  color: var(--color-text);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-close:hover { background: var(--color-border); }
+
+/* 
+   WORK LIGHTBOX (per-item image gallery)
+*/
+.lightbox-media {
+  width: 100%;
+  font-size: 1.1rem;
+}
+
+.lightbox-caption {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.lightbox-caption h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.lightbox-nav {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* No circular button chrome for the lightbox close/prev/next controls */
+.lightbox-close,
+.lightbox-prev,
+.lightbox-next {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.lightbox-close:hover,
+.lightbox-prev:hover,
+.lightbox-next:hover {
+  background: transparent;
+  opacity: 0.65;
+}
+
+/* 
+   SHARED CONTROLS (buttons used by featured slider)
+ */
+.ctrl {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  padding: 0;
+  transition: color 0.25s ease, filter 0.25s ease, transform 0.15s ease;
+}
+
+.ctrl svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: filter 0.25s ease;
+}
+
+/* Ember-orange glow flare on hover/focus — matches the .ember particle
+   colour (#ff8a3d) instead of a solid filled button, so the controls
+   read as "sparking" rather than boxy UI chrome. */
+.ctrl:hover,
+.ctrl:focus-visible {
+  color: #ffb17a;
+  filter:
+    drop-shadow(0 0 5px rgba(255, 138, 61, 0.85))
+    drop-shadow(0 0 14px rgba(255, 138, 61, 0.5));
+}
+
+.ctrl:hover { transform: translateY(-1px); }
+.ctrl:active { transform: translateY(0) scale(0.92); }
+
+.ctrl:focus-visible {
+  outline: 2px solid rgba(255, 138, 61, 0.6);
+  outline-offset: 4px;
+}
+
+/*
+   LOGO GRID
+ */
+.logo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1px;
+  background: var(--color-border);
+  border: 1px solid var(--color-border);
+  margin-top: 32px;
+}
+
+.logo-item {
+  background: var(--color-bg-alt);
+  aspect-ratio: 3 / 1.4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  overflow: hidden;
+}
+
+/* Logos are shown whole (not cropped) — swap in real logo files any size,
+   they'll scale down to fit the box. */
+.logo-item img {
+  max-width: 70%;
+  max-height: 70%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Plain variant — no grid lines, no tile backgrounds. Just drop in
+   transparent (PNG/SVG) logo files and they'll sit directly on the
+   page background, evenly spaced. */
+.logo-grid--plain {
+  background: none;
+  border: none;
+  gap: clamp(24px, 4vw, 56px);
+}
+
+.logo-grid--plain .logo-item {
+  background: none;
+  aspect-ratio: auto;
+  height: 64px;
+}
+
+.logo-grid--plain .logo-item img {
+  max-width: 85%;
+  max-height: 100%;
+  opacity: 0.85;
+  transition: opacity 0.15s ease;
+}
+
+/*.logo-grid--plain .logo-item img:hover {
+  opacity: 1;
+}*/
+
+/*
+   SERVICE CARDS (2 x 2, full width, pop on hover)
+ */
+.service-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(20px, 2.5vw, 40px);
+  padding: 32px var(--gutter) 0;
+}
+
+.service-card {
+  position: relative;
+  background: #000;
+  border: 1px solid rgba(255, 60, 60, 0.45);
+  border-radius: var(--radius);
+  box-shadow: 0 0 8px rgba(255, 40, 40, 0.2);
+  overflow: hidden;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.service-card:hover,
+.service-card:focus-visible {
+  transform: translateY(-8px) scale(1.02);
+  border-color: rgba(255, 90, 90, 0.9);
+  z-index: 2;
+  outline: none;
+}
+
+.service-media {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.service-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* whole image shows inside the box, no cropping */
+  transition: transform 0.5s ease;
+}
+
+.service-card:hover .service-media img,
+.service-card:focus-visible .service-media img {
+  transform: scale(1.06);
+}
+
+.service-body {
+  padding: clamp(18px, 2vw, 28px);
+}
+
+.service-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.service-num {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #e03b34;
+}
+
+.service-body h3 {
+  font-size: 1.4rem;
+  color: #fff;
+}
+
+.service-body p {
+  margin: 0;
+  color: #fff;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 720px) {
+  .service-cards { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-card,
+  .service-media img { transition: none; }
+  .service-card:hover,
+  .service-card:focus-visible { transform: none; }
+}
+
+/*
+   SERVICE POPUP — click a service card to open it. Reuses the work
+   lightbox's dark overlay and close button; the box is styled like
+   the red-edged service cards, with the description in red.
+ */
+.service-card { cursor: pointer; }
+
+.service-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  color: #ff5a52;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.service-more svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.2s ease;
+}
+
+.service-card:hover .service-more svg,
+.service-card:focus-visible .service-more svg { transform: translateX(4px); }
+
+/* hidden while closed so its close button can't be tabbed to */
+.service-modal {
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.service-modal.active {
+  visibility: visible;
+  transition: opacity 0.2s ease, visibility 0s; /* show straight away so the close button can take focus */
+}
+
+.service-modal-box {
+  width: min(860px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  background: #000;
+  border: 1px solid rgba(255, 60, 60, 0.6);
+  border-radius: var(--radius);
+  box-shadow: 0 0 24px rgba(255, 40, 40, 0.3);
+  transform: translateY(12px) scale(0.98);
+  transition: transform 0.25s ease;
+}
+
+.service-modal.active .service-modal-box { transform: none; }
+
+.service-modal-media {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  background: #000;
+}
+
+.service-modal-body {
+  padding: clamp(20px, 3vw, 36px);
+}
+
+.service-modal-title {
+  font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+  color: #fff;
+}
+
+.service-modal-text p {
+  margin: 0 0 14px;
+  color: #ff5a52; /* the red description text */
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.service-modal-text p:last-child { margin-bottom: 0; }
+
+/* Phones: leave room above the box for the close button */
+@media (max-width: 720px) {
+  .service-modal { padding: 76px 16px 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-modal-box,
+  .service-more svg { transition: none; }
+  .service-modal-box { transform: none; }
+}
+
+/*
+   VALUES GRID
+ */
+.values-grid {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 2.5vw, 36px);
+  margin-top: 32px;
+}
+
+.value-item {
+  width: 100%;
+  padding: clamp(24px, 3vw, 40px);
+  border: 1px solid rgba(255, 60, 60, 0.45);
+  border-radius: var(--radius);
+  box-shadow: 0 0 8px rgba(255, 40, 40, 0.2);
+  animation: value-glow 5s ease-in-out infinite;
+}
+
+.value-item:nth-child(2) { animation-delay: -1.2s; }
+.value-item:nth-child(3) { animation-delay: -2.5s; }
+.value-item:nth-child(4) { animation-delay: -3.7s; }
+
+@keyframes value-glow {
+  0%, 100% {
+    border-color: rgba(255, 60, 60, 0.35);
+    box-shadow: 0 0 6px rgba(255, 40, 40, 0.15);
+  }
+  50% {
+    border-color: rgba(255, 60, 60, 0.55);
+    box-shadow: 0 0 14px rgba(255, 40, 40, 0.3);
+  }
+}
+
+.value-item h3 {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  color: #ffffff;
+}
+
+.value-item p {
+  color: #ffffff;
+  font-size: 1rem;
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .value-item { animation: none; }
+}
+
+/*
+   TEAM CARDS (red box per member, photo breaks out on the left, no hover effects)
+ */
+.team-list {
+  --photo-w: clamp(150px, 16vw, 260px);
+  width: 60%;
+  margin: clamp(56px, 6vw, 80px) auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(64px, 7vw, 96px);
+}
+
+.team-card {
+  position: relative;
+  min-height: calc(var(--photo-w) * 1.25);
+  padding: clamp(20px, 2vw, 28px) clamp(20px, 2vw, 28px) clamp(20px, 2vw, 28px) calc(var(--photo-w) + 8px);
+  background: #a51514;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+}
+
+/* The frame — keeps its size and clips the photo inside it */
+.team-photo {
+  position: absolute;
+  top: -28px;
+  left: -24px;
+  width: var(--photo-w);
+  aspect-ratio: 10 / 13;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: #7d0f0e;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* The photo — set --zoom / --focus on a .team-photo to crop in closer */
+.team-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--focus, center);
+  transform: scale(var(--zoom, 1));
+  transform-origin: var(--focus, center);
+}
+
+.team-name {
+  font-size: clamp(1.6rem, 2.4vw, 2.4rem);
+  color: #fff;
+}
+
+.team-role {
+  margin: 6px 0 14px;
+  color: #f5c4c3;
+  font-size: 0.95rem;
+}
+
+.team-bio {
+  margin: 0 0 16px;
+  max-width: 60ch;
+  color: #fff;
+  line-height: 1.6;
+}
+
+.team-tags {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.team-tags li {
+  background: #7d0f0e;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 3px 10px;
+  border-radius: var(--radius);
+}
+
+/* Email + ArtStation buttons sit side by side, wrapping on small screens */
+.team-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.team-link {
+  display: inline-flex;
+  max-width: 100%;
+  overflow-wrap: anywhere; /* long email addresses can wrap on phones */
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid #fff;
+  border-radius: var(--radius);
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.team-link svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* keyboard focus only (no hover effects) */
+.team-link:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+/* Phones: one column, photo still pokes out of the top-left corner */
+@media (max-width: 720px) {
+  .team-list {
+    width: calc(100% - 2 * var(--gutter));
+    gap: 80px;
+  }
+
+  .team-card {
+    display: block;
+    min-height: 0;
+    padding: 20px;
+  }
+
+  .team-photo {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 150px;
+    margin: -48px 0 16px -6px;
+  }
+}
+
+/* 
+   CONTACT
+ */
+.contact-info h2 {
+  margin-bottom: 0;
+}
+
+.contact-lead {
+  color: var(--color-text-muted);
+  margin-top: 16px;
+  max-width: 50ch;
+}
+
+.contact-details {
+  list-style: none;
+  margin: 32px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(24px, 4vw, 56px);
+}
+
+.contact-details li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.contact-details a,
+.contact-details span:last-child {
+  color: var(--color-text);
+  font-size: 1.05rem;
+}
+
+.contact-details a:hover { color: var(--color-text-muted); }
+
+.contact-label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+/*
+   CONTACT FORM (Web3Forms) — red-edged fields to match the service/value cards
+ */
+.contact-form {
+  margin-top: 40px;
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.contact-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.contact-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.contact-field input,
+.contact-field textarea {
+  width: 100%;
+  font: inherit;
+  color: var(--color-text);
+  background: #000;
+  border: 1px solid rgba(255, 60, 60, 0.45);
+  border-radius: var(--radius);
+  box-shadow: 0 0 8px rgba(255, 40, 40, 0.2);
+  padding: 12px 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contact-field textarea {
+  resize: vertical;
+  min-height: 150px;
+}
+
+.contact-field input:focus,
+.contact-field textarea:focus {
+  outline: none;
+  border-color: rgba(255, 90, 90, 0.95);
+  box-shadow: 0 0 14px rgba(255, 40, 40, 0.4);
+}
+
+.contact-submit {
+  align-self: flex-start;
+  font: inherit;
+  font-weight: 600;
+  color: #fff;
+  background: #a51514;
+  border: 1px solid #a51514;
+  border-radius: var(--radius);
+  padding: 12px 26px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contact-submit:hover,
+.contact-submit:focus-visible {
+  background: #c21c1a;
+  box-shadow: 0 0 14px rgba(255, 40, 40, 0.45);
+}
+
+.contact-submit:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.contact-submit:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.contact-botcheck { display: none; }
+
+.contact-status {
+  margin: 0;
+  min-height: 1.5em;
+  color: var(--color-text-muted);
+}
+
+.contact-status.is-success { color: #fff; font-size: 1.1rem; }
+.contact-status.is-error { color: #ff8a80; }
+
+/* Once sent, only the thank-you message is left showing */
+.contact-form.is-sent > :not(.contact-status) { display: none; }
+
+@media (max-width: 720px) {
+  .contact-form-row { grid-template-columns: 1fr; }
+}
+
+.site-footer {
+  border-top: 1px solid var(--color-border);
+  padding: 32px 0;
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+/* 
+   RESPONSIVE
+ */
+@media (max-width: 720px) {
+  .nav { display: none; } /* swap for a mobile menu when ready */
+  .section-head { flex-direction: column; align-items: flex-start; gap: 16px; }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .ctrl { transition: none; }
+}/*
+   TOKENS — edit these to reskin the whole page
+ */
+:root {
+  --color-bg: #0d0d0d;
+  --color-bg-alt: #000000;
+  --color-text: #f4f4f2;
+  --color-text-muted: #9a9a97;
+  --color-border: #2c2c2a;
+  --color-accent: #ffffff;
+
+  --font-display: "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Helvetica Neue", Arial, sans-serif;
+
+  /* page content caps out at a comfortable reading width,
+     even on very large / 4K monitors */
+  --wrap-max: 1440px;
+  --gutter: clamp(20px, 4vw, 64px);
+
+  --radius: 4px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-bg);
+  line-height: 1.5;
+  font-size: clamp(16px, 1vw, 18px); /* scales gently on huge screens */
+  /* Clips any stray horizontal overflow (e.g. an ember drifting past the
+     right edge — #tech intentionally doesn't clip so they can rise into
+     hero-caption) so the page never gains extra un-textured scroll space
+     past the edge of the contours background. */
+  overflow-x: hidden;
+}
+
+img { max-width: 100%; display: block; }
+
+a { color: inherit; text-decoration: none; }
+
+h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
+
+.wrap {
+  max-width: var(--wrap-max);
+  margin: 0 auto;
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+}
+
+/* 
+   HEADER
+ */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(13,13,13,0.85);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--color-border);
+  z-index: 100;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+}
+
+.site-header.is-visible {
+  transform: translateY(0);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;  /* Vertically aligns the image and text */
+    gap: 10px;            /* Space between them */
+    text-decoration: none;
+    color: white;
+}
+
+.logo img {
+    width: 160px;
+    height: auto;
+}
+.logo {
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  font-size: 1rem;
+}
+
+.nav { display: flex; gap: clamp(16px, 2vw, 32px); }
+
+.nav a {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+  background-repeat: no-repeat;
+}
+
+.nav a:hover, .nav a:focus-visible {
+  color: var(--color-text);
+  border-color: #e53935;
+
+  /* Contours snippet — NOTE: no background-attachment:fixed here.
+     The header this lives in is animated with a transform (to slide
+     in/out), and any transformed ancestor turns "fixed" backgrounds
+     into a buggy, jumpy mess (the transform creates a new containing
+     block, so "fixed" stops meaning "relative to the viewport"). Using
+     the default (scroll) attachment keeps it stable — every link still
+     shows the same crop of the texture, it just won't shift with the
+     page scroll position.
+
+     background-size is a large percentage (not "cover") so the image
+     is blown up well past the button's size — cover was scaling the
+     image down to just barely fit, which showed almost the entire
+     graphic rather than a cropped section of it. */
+  background-image:
+    linear-gradient(rgba(13, 13, 13, 0.55), rgba(13, 13, 13, 0.55)),
+    url('images/contours.webp');
+  background-size: auto, 2800% 2800%;
+  background-position: center;
+}
+
+/* 
+   MOTTO / HERO CAPTION (sits in normal flow directly under the
+   full-screen carousel, rather than overlaid on top of it)
+ */
+.hero-caption {
+  padding: clamp(40px, 6vw, 80px) 0;
+}
+
+.hero-motto {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/*
+   EMBERS — glowing particles that originate right at the seam between
+   Technology and Work below it (i.e. the bottom edge of #tech), then
+   drift up and fade as they rise through Technology into the hero/quote
+   section above — as if sparking off that seam and floating upward.
+   Particles are generated in JS (randomized size/speed/position/path)
+   and animated purely with CSS for performance. Each ember follows a
+   3-stage zigzag path (drift1 -> drift2 -> drift3) instead of a
+   straight line, plus randomized rotation, for a chaotic scatter
+   rather than a uniform rise.
+
+   Note: unlike a normal contained effect, #tech deliberately does NOT
+   clip overflow, so embers are free to travel above its own box and
+   visually pass into the hero-caption/quote section that precedes it.
+ */
+#tech {
+  position: relative;
+}
+
+#tech > .wrap {
+  position: relative;
+  z-index: 1;
+}
+
+/* Soft glow strip marking the seam the embers spark off from */
+#tech::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 140px;
+  background: radial-gradient(
+    ellipse 60% 100% at 50% 100%,
+    rgba(255, 138, 61, 0.16),
+    rgba(255, 138, 61, 0) 75%
+  );
+  z-index: 0;
+  pointer-events: none;
+}
+
+.embers {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.ember {
+  position: absolute;
+  bottom: -16px;
+  left: var(--x);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffe3b0 0%, #ff8a3d 45%, rgba(255, 90, 20, 0) 75%);
+  box-shadow: 0 0 7px 1px rgba(255, 130, 40, 0.6);
+  opacity: 0;
+  animation: ember-rise var(--duration) var(--ease, ease-in-out) var(--delay) infinite;
+}
+
+@keyframes ember-rise {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(0.5);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--peak-opacity, 0.75);
+  }
+  30% {
+    transform: translate(var(--drift1), calc(var(--fall) * -0.22)) rotate(var(--spin1, 40deg)) scale(1);
+  }
+  55% {
+    opacity: calc(var(--peak-opacity, 0.75) * 0.85);
+    transform: translate(var(--drift2), calc(var(--fall) * -0.55)) rotate(var(--spin2, -30deg)) scale(0.75);
+  }
+  80% {
+    opacity: calc(var(--peak-opacity, 0.75) * 0.4);
+  }
+  100% {
+    transform: translate(var(--drift3), calc(var(--fall) * -1)) rotate(var(--spin3, 60deg)) scale(0.15);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .embers,
+  #tech::before { display: none; }
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin: 0 0 16px;
+}
+
+.hero-caption h1 {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 700;
+  max-width: 20ch;
+}
+
+.hero-caption .hero-sub {
+  margin-top: 20px;
+  max-width: 50ch;
+  font-size: clamp(1rem, 1.2vw, 1.25rem);
+  color: var(--color-text-muted);
+}
+
+/*
+   GENERIC SECTION
+ */
+.section {
+  padding: clamp(48px, 7vw, 96px) 0;
+}
+
+.section.alt {
+  background-color: var(--color-bg-alt);
+  background-image:
+    linear-gradient(
+      to bottom,
+      rgba(13, 13, 13, 0.92) 0,
+      rgba(26, 26, 26, 0.45) 60px,
+      rgba(26, 26, 26, 0.45) calc(100% - 60px),
+      rgba(13, 13, 13, 0.92) 100%
+    ),
+    url('images/contours.webp');
+  background-size: 100% 100%, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+}
+
+.section h2 {
+  font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+  margin-bottom: 32px;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0;
+}
+
+.section-head h2 { margin-bottom: 0; }
+
+/* 
+   FEATURED WORK (full-screen auto-playing slide)
+ */
+.featured {
+  position: relative;
+  height: 100vh;
+  min-height: 480px;
+  overflow: hidden;
+  background-color: var(--color-bg-alt);
+  background-image:
+    linear-gradient(
+      to bottom,
+      rgba(13, 13, 13, 0.92) 0,
+      rgba(26, 26, 26, 0.45) 60px,
+      rgba(26, 26, 26, 0.45) calc(100% - 60px),
+      rgba(13, 13, 13, 0.92) 100%
+    ),
+    url('images/contours.webp');
+  background-size: 100% 100%, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    inset 0 0 90px rgba(255, 255, 255, 0.10);
+}
+
+.featured-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.6s ease;
+}
+
+.featured-slide {
+  position: relative;
+  flex: 0 0 100%;
+  height: 100%;
+}
+
+.featured-media {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  margin-bottom: 0;
+  aspect-ratio: auto;
+}
+
+.featured-caption {
+  position: absolute;
+  left: var(--gutter);
+  bottom: 96px;
+  color: var(--color-text);
+  background: rgba(13, 13, 13, 0.7);
+  padding: 12px 20px;
+  border-radius: var(--radius);
+}
+
+.featured-caption h3 {
+  font-size: 1.4rem;
+  margin-bottom: 4px;
+}
+
+.featured-caption p {
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.featured-controls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.featured-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.featured-dots .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid var(--color-text-muted);
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.featured-dots .dot.active {
+  background: var(--color-text);
+  border-color: var(--color-text);
+}
+
+/*
+   CARD MEDIA / PLACEHOLDER (shared)
+ */
+.card-media {
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+}
+
+.card-media.square { aspect-ratio: 1 / 1; }
+
+/* Once a placeholder div is swapped for a real <img class="card-media">,
+   this makes it fill the box and crop nicely instead of stretching. */
+img.card-media,
+.lightbox-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card-media2.square { aspect-ratio: 1 / 1; }
+
+/* Once a placeholder div is swapped for a real <img class="card-media">,
+   this makes it fill the box and crop nicely instead of stretching. */
+img.card-media2,
+.lightbox-media img {
+  width: 150%;
+  height: 100%;
+  object-fit: contain; 
+  display: block; 
+}
+
+.placeholder {
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/*
+   WORK STACKS (fanned images, click to open the lightbox)
+ */
+.work-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: clamp(32px, 4vw, 72px);
+  max-width: 1100px;
+  margin: 32px auto 0;
+}
+
+.work-item {
+  position: relative;
+  text-align: center;
+}
+
+.work-stack {
+  position: relative;
+  z-index: 1;
+  aspect-ratio: 4 / 3;
+  cursor: zoom-in;
+}
+
+/* the front image (your real cover photo) */
+.work-stack .card-media {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 76%;
+  height: 76%;
+  margin: auto;
+  aspect-ratio: auto;
+  transition: transform 0.3s ease;
+}
+
+.work-stack:hover .card-media,
+.work-stack:focus-visible .card-media {
+  transform: scale(1.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .work-stack .card-media { transition: none; }
+  .work-stack:hover .card-media,
+  .work-stack:focus-visible .card-media { transform: none; }
+}
+
+/* the two fanned layers behind it (filled with the next two images by index.js) */
+.work-stack::before,
+.work-stack::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 76%;
+  height: 76%;
+  margin: auto;
+  background-color: #141414;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid #3a3a38;
+  border-radius: var(--radius);
+  filter: brightness(0.55);
+}
+
+.work-stack::before {
+  z-index: 0;
+  background-image: var(--back-1, none);
+  transform: rotate(-6deg) translateX(-14px);
+}
+
+.work-stack::after {
+  z-index: 1;
+  background-image: var(--back-2, none);
+  transform: rotate(4deg) translateX(12px);
+}
+
+/* mirror the fan on every second project */
+.work-item:nth-child(even) .work-stack::before { transform: rotate(5deg) translateX(14px); }
+.work-item:nth-child(even) .work-stack::after  { transform: rotate(-4deg) translateX(-12px); }
+
+.work-stack:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 6px;
+}
+
+.work-item h3 {
+  margin-top: 14px;
+  font-size: 1.15rem;
+  color: #fff;
+}
+
+.work-count {
+  margin: 4px 0 0;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+/*
+   WORK SECTION BACKGROUND
+   Spotlight: the contour texture is brightest behind the projects and
+   fades to the page colour toward every edge (no hard top/bottom cut)
+ */
+#all-work {
+  position: relative;
+  background-color: #0d0d0d;
+  background-image:
+    linear-gradient(to bottom, #0d0d0d 0, rgba(13, 13, 13, 0) 20%, rgba(13, 13, 13, 0) 80%, #0d0d0d 100%),
+    radial-gradient(ellipse 58% 60% at 50% 58%, rgba(13, 13, 13, 0) 0%, rgba(13, 13, 13, 0.35) 40%, rgba(13, 13, 13, 0.9) 80%, #0d0d0d 100%),
+    url('images/contours.webp');
+  /* The two fade layers overhang the section by 1px top and bottom. Without
+     this, on scaled displays (e.g. Windows at 125-175%) they can round a
+     pixel short and leave a thin line of unfaded contours at the edge. */
+  background-size: 100% calc(100% + 2px), 100% calc(100% + 2px), cover;
   background-position: center;
   background-repeat: no-repeat;
 }
