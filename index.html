@@ -95,7 +95,7 @@
 
     
     <div class="service-cards">
-      <article class="service-card" tabindex="0">
+      <article class="service-card" tabindex="0" role="button" aria-haspopup="dialog" aria-label="Co-development: find out more">
         <div class="service-media">
           <img src="images/service-1.png" alt="Co-development example render">
         </div>
@@ -106,10 +106,16 @@
             <h3>Co-development</h3>
           </div>
           <p>We work alongside existing teams, studios or individuals, providing flexible 3D support throughout a project's development.</p>
+          <span class="service-more" aria-hidden="true">Find out more <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+        <!-- Popup text: shown in red when the card is clicked. Add or remove <p> paragraphs freely. -->
+        <div class="service-detail" hidden>
+          <p>Whether you're a studio that needs extra hands to hit a milestone, or a solo developer who needs a specialist for part of a project, we slot into your existing pipeline and work to your art direction, standards and deadlines.</p>
+          <p>We can pick up anything from individual props and assets through to full modular environments, materials and technical workflows, and stay involved for as much or as little of the project as you need.</p>
         </div>
       </article>
 
-      <article class="service-card" tabindex="0">
+      <article class="service-card" tabindex="0" role="button" aria-haspopup="dialog" aria-label="3D visualisation: find out more">
         <div class="service-media">
           <img src="images/service-2.png" alt="3D visualisation example render">
         </div>
@@ -119,10 +125,15 @@
             <h3>3D visualisation</h3>
           </div>
           <p>3D product, location and engineering visualisation for marketing, presentation and interactive experiences.</p>
+          <span class="service-more" aria-hidden="true">Find out more <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+        <div class="service-detail" hidden>
+          <p>We turn products, locations and engineering designs into clear, high-quality 3D visuals for marketing material, client presentations, pitches and interactive experiences.</p>
+          <p>From a single hero render to a full walkthrough of a space, we build accurate models from your drawings, plans or reference material and present them in the way that best tells their story.</p>
         </div>
       </article>
 
-      <article class="service-card" tabindex="0">
+      <article class="service-card" tabindex="0" role="button" aria-haspopup="dialog" aria-label="Digital marketplace: find out more">
         <div class="service-media">
           <img src="images/service-3.png" alt="Digital marketplace example render">
         </div>
@@ -132,10 +143,15 @@
             <h3>Digital marketplace</h3>
           </div>
           <p>High-quality 3D assets and asset packs created in-house for digital marketplaces.</p>
+          <span class="service-more" aria-hidden="true">Find out more <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+        <div class="service-detail" hidden>
+          <p>Alongside client work, we create our own 3D assets and asset packs in-house for digital marketplaces, for artists and developers to use in their own projects.</p>
+          <p>Every pack is built with the same care as our client work: clean, well organised and ready to drop straight into your scenes.</p>
         </div>
       </article>
 
-      <article class="service-card" tabindex="0">
+      <article class="service-card" tabindex="0" role="button" aria-haspopup="dialog" aria-label="Custom commission: find out more">
         <div class="service-media">
           <img src="images/service-4.png" alt="Custom commission example render">
         </div>
@@ -145,6 +161,11 @@
             <h3>Custom commission</h3>
           </div>
           <p>Bespoke 3D, interactive and digital projects tailored to your specific requirements.</p>
+          <span class="service-more" aria-hidden="true">Find out more <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+        </div>
+        <div class="service-detail" hidden>
+          <p>Have something in mind that doesn't fit neatly into a box? We take on bespoke 3D, interactive and digital projects shaped entirely around your requirements.</p>
+          <p>We'll talk through your idea, budget and timeline with you, agree what's in scope, and keep you involved from first concept through to final delivery.</p>
         </div>
       </article>
     </div>
@@ -421,6 +442,21 @@
       <button class="ctrl lightbox-next" aria-label="Next image">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
       </button>
+    </div>
+  </div>
+
+  <!-- Service details popup (filled in from whichever service card is clicked) -->
+  <div class="lightbox service-modal" id="service-modal" role="dialog" aria-modal="true" aria-labelledby="service-modal-title">
+    <button class="lightbox-close" aria-label="Close" data-service-close>&times;</button>
+    <div class="service-modal-box">
+      <img class="service-modal-media" src="" alt="">
+      <div class="service-modal-body">
+        <div class="service-title-row">
+          <span class="service-num service-modal-num"></span>
+          <h3 class="service-modal-title" id="service-modal-title"></h3>
+        </div>
+        <div class="service-modal-text"></div>
+      </div>
     </div>
   </div>
 

@@ -325,3 +325,72 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
     }
   });
 })();
+
+// -------------------------------------------------------------------
+// SERVICE POPUP
+// Clicking (or pressing Enter on) a service card opens a box with its
+// image, title and the longer description from its .service-detail.
+// Close with the X, by clicking outside the box, or with Escape.
+// -------------------------------------------------------------------
+(() => {
+  const modal = document.getElementById('service-modal');
+  if (!modal) return;
+
+  const box = modal.querySelector('.service-modal-box');
+  const media = modal.querySelector('.service-modal-media');
+  const numEl = modal.querySelector('.service-modal-num');
+  const titleEl = modal.querySelector('.service-modal-title');
+  const textEl = modal.querySelector('.service-modal-text');
+  const closeBtn = modal.querySelector('[data-service-close]');
+  let lastCard = null;
+
+  const open = (card) => {
+    const img = card.querySelector('.service-media img');
+    media.hidden = !img;
+    media.src = img ? img.getAttribute('src') : '';
+    media.alt = img ? img.alt : '';
+    numEl.textContent = card.querySelector('.service-num')?.textContent || '';
+    titleEl.textContent = card.querySelector('h3')?.textContent || '';
+
+    // Long description if there is one, otherwise the card's short text
+    const detail = card.querySelector('.service-detail');
+    if (detail) {
+      textEl.innerHTML = detail.innerHTML;
+    } else {
+      const p = document.createElement('p');
+      p.textContent = card.querySelector('.service-body p')?.textContent || '';
+      textEl.replaceChildren(p);
+    }
+
+    lastCard = card;
+    box.scrollTop = 0;
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    closeBtn.focus();
+  };
+
+  const close = () => {
+    if (!modal.classList.contains('active')) return;
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+    if (lastCard) lastCard.focus();
+  };
+
+  document.querySelectorAll('#services .service-card').forEach((card) => {
+    card.addEventListener('click', () => open(card));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        open(card);
+      }
+    });
+  });
+
+  closeBtn.addEventListener('click', close);
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) close();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') close();
+  });
+})();

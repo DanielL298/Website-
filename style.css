@@ -917,6 +917,98 @@ img.card-media2,
 }
 
 /*
+   SERVICE POPUP — click a service card to open it. Reuses the work
+   lightbox's dark overlay and close button; the box is styled like
+   the red-edged service cards, with the description in red.
+ */
+.service-card { cursor: pointer; }
+
+.service-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  color: #ff5a52;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.service-more svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.2s ease;
+}
+
+.service-card:hover .service-more svg,
+.service-card:focus-visible .service-more svg { transform: translateX(4px); }
+
+/* hidden while closed so its close button can't be tabbed to */
+.service-modal {
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.service-modal.active {
+  visibility: visible;
+  transition: opacity 0.2s ease, visibility 0s; /* show straight away so the close button can take focus */
+}
+
+.service-modal-box {
+  width: min(860px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  background: #000;
+  border: 1px solid rgba(255, 60, 60, 0.6);
+  border-radius: var(--radius);
+  box-shadow: 0 0 24px rgba(255, 40, 40, 0.3);
+  transform: translateY(12px) scale(0.98);
+  transition: transform 0.25s ease;
+}
+
+.service-modal.active .service-modal-box { transform: none; }
+
+.service-modal-media {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  background: #000;
+}
+
+.service-modal-body {
+  padding: clamp(20px, 3vw, 36px);
+}
+
+.service-modal-title {
+  font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+  color: #fff;
+}
+
+.service-modal-text p {
+  margin: 0 0 14px;
+  color: #ff5a52; /* the red description text */
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.service-modal-text p:last-child { margin-bottom: 0; }
+
+/* Phones: leave room above the box for the close button */
+@media (max-width: 720px) {
+  .service-modal { padding: 76px 16px 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-modal-box,
+  .service-more svg { transition: none; }
+  .service-modal-box { transform: none; }
+}
+
+/*
    VALUES GRID
  */
 .values-grid {
