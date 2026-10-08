@@ -146,6 +146,91 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
   }
 
   container.appendChild(frag);
+
+  // -----------------------------------------------------------------
+  // CURSOR REPEL
+  // Embers gently drift away from the mouse when it gets close, then
+  // ease back onto their normal path once it moves off. This uses the
+  // separate CSS `translate` property, which stacks on top of the
+  // keyframe `transform`, so the rise/zigzag animation keeps running
+  // untouched underneath. Mouse/trackpad only — touch screens skip it.
+  // -----------------------------------------------------------------
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+  const REPEL_RADIUS = 110;  // px: how close the cursor has to get before embers react
+  const REPEL_STRENGTH = 26; // px: the furthest an ember gets nudged (keep it small for subtle)
+  const REPEL_EASE = 0.08;   // 0-1: lower = softer, lazier drift; higher = snappier
+
+  const OFF_PAGE = -99999;
+  const particles = Array.from(container.children).map((el) => ({ el, x: 0, y: 0 }));
+  let mouseX = OFF_PAGE;
+  let mouseY = OFF_PAGE;
+  let inView = false;
+  let frame = null;
+
+  const tick = () => {
+    frame = null;
+    if (!inView) return;
+
+    // Read every ember's position first, then write, so the browser
+    // only has to work out the layout once per frame.
+    const rects = particles.map((p) => p.el.getBoundingClientRect());
+    let settling = false;
+
+    particles.forEach((p, i) => {
+      const r = rects[i];
+      // where the ember would be without our nudge
+      const cx = r.left + r.width / 2 - p.x;
+      const cy = r.top + r.height / 2 - p.y;
+      const dx = cx - mouseX;
+      const dy = cy - mouseY;
+      const dist = Math.hypot(dx, dy) || 1;
+
+      let targetX = 0;
+      let targetY = 0;
+      if (dist < REPEL_RADIUS) {
+        // strongest right under the cursor, fading smoothly to nothing at the edge
+        const force = (1 - dist / REPEL_RADIUS) ** 2 * REPEL_STRENGTH;
+        targetX = (dx / dist) * force;
+        targetY = (dy / dist) * force;
+      }
+
+      p.x += (targetX - p.x) * REPEL_EASE;
+      p.y += (targetY - p.y) * REPEL_EASE;
+      if (Math.abs(p.x) > 0.05 || Math.abs(p.y) > 0.05) settling = true;
+
+      p.el.style.translate = `${p.x.toFixed(2)}px ${p.y.toFixed(2)}px`;
+    });
+
+    // Keep going while the cursor is on the page (embers keep rising
+    // into it even if it's still), or until every ember has eased back.
+    if (mouseX !== OFF_PAGE || settling) frame = requestAnimationFrame(tick);
+  };
+
+  const start = () => {
+    if (!frame && inView) frame = requestAnimationFrame(tick);
+  };
+
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    start();
+  }, { passive: true });
+
+  // cursor left the browser window: let the embers drift back
+  window.addEventListener('mouseout', (e) => {
+    if (!e.relatedTarget) {
+      mouseX = OFF_PAGE;
+      mouseY = OFF_PAGE;
+    }
+  });
+
+  // Only run while the embers are on (or near) the screen. The margin
+  // covers the embers that rise up out of #tech into the section above.
+  new IntersectionObserver(([entry]) => {
+    inView = entry.isIntersecting;
+    start();
+  }, { rootMargin: '450px 0px' }).observe(container);
 })();
 
 // -------------------------------------------------------------------

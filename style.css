@@ -835,7 +835,10 @@ img.card-media2,
 }*/
 
 /*
-   SERVICE CARDS (2 x 2, full width, pop on hover)
+   SERVICE CARDS (2 x 2, full width)
+   On hover the card itself stays put — only the image zooms inside its
+   frame, and the red border/glow brightens. Scaling the whole card made
+   the text shift and blur, so that's deliberately avoided.
  */
 .service-cards {
   display: grid;
@@ -851,20 +854,19 @@ img.card-media2,
   border-radius: var(--radius);
   box-shadow: 0 0 8px rgba(255, 40, 40, 0.2);
   overflow: hidden;
-  transition: transform 0.3s ease, border-color 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .service-card:hover,
 .service-card:focus-visible {
-  transform: translateY(-8px) scale(1.02);
   border-color: rgba(255, 90, 90, 0.9);
-  z-index: 2;
+  box-shadow: 0 0 16px rgba(255, 40, 40, 0.35);
   outline: none;
 }
 
 .service-media {
   aspect-ratio: 16 / 9;
-  overflow: hidden;
+  overflow: hidden; /* crops the image as it zooms */
 }
 
 .service-media img {
@@ -876,7 +878,7 @@ img.card-media2,
 
 .service-card:hover .service-media img,
 .service-card:focus-visible .service-media img {
-  transform: scale(1.06);
+  transform: scale(1.08);
 }
 
 .service-body {
@@ -915,8 +917,8 @@ img.card-media2,
 @media (prefers-reduced-motion: reduce) {
   .service-card,
   .service-media img { transition: none; }
-  .service-card:hover,
-  .service-card:focus-visible { transform: none; }
+  .service-card:hover .service-media img,
+  .service-card:focus-visible .service-media img { transform: none; }
 }
 
 /*
@@ -1014,6 +1016,14 @@ img.card-media2,
 /*
    VALUES GRID
  */
+/* Centre the "Values" heading image. Its wrapper is a .section-head
+   flex row (which pins it left), and on phones .section-head turns into
+   a left-aligned column, so both directions are centred here. */
+#values .section-head {
+  justify-content: center;
+  align-items: center;
+}
+
 .values-grid {
   display: flex;
   flex-direction: column;
