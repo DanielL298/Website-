@@ -193,7 +193,12 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  overflow: visible;
+  /* Embers can still rise up out of this box into the section above,
+     but are trimmed at the left/right screen edges. Without this, an
+     ember drifting off the side made phones widen the whole page, which
+     pushed fixed things (header, gallery close button) off-screen. */
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 .ember {
@@ -327,9 +332,9 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
   display: flex;
   height: 100%;
   transition: transform 0.6s ease;
-  /* Up/down finger movement still scrolls the page; sideways swipes
-     are handed to index.js to change slide. */
-  touch-action: pan-y;
+  /* Up/down finger movement still scrolls the page and pinch-zoom still
+     works; sideways swipes are handed to index.js to change slide. */
+  touch-action: pan-y pinch-zoom;
   user-select: none;
   -webkit-user-select: none;
 }
@@ -717,6 +722,16 @@ img.card-media2,
   opacity: 1;
   pointer-events: auto;
 }
+
+/* Work gallery: sideways swipes go to index.js to change image;
+   pinch-zoom still works for a closer look. */
+#lightbox {
+  touch-action: pan-y pinch-zoom;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#lightbox .lightbox-media { -webkit-user-drag: none; }
 
 .lightbox-content {
   max-width: 100%;

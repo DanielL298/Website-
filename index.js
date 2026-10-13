@@ -20,6 +20,83 @@
   window.addEventListener('scroll', updateHeader, { passive: true });
 })();
 
+// -------------------------------------------------------------------
+// SWIPE HELPER (shared by the featured slider and the work gallery)
+// Watches an element for sideways finger swipes. Up/down movement and
+// pinch-zoom are left to the browser (touch-action in the CSS), and
+// mouse input is ignored, since desktop users have the arrows, dots
+// and arrow keys. Hooks:
+//   enabled()     return false to ignore touches (e.g. only one image)
+//   onStart()     finger went down
+//   onDrag(dx)    finger has moved sideways by dx pixels
+//   onSwipe(dir)  let go after a real swipe: 1 = next, -1 = previous
+//   onCancel()    let go without a swipe, so spring back
+// -------------------------------------------------------------------
+function addSwipe(el, { enabled = () => true, onStart, onDrag, onSwipe, onCancel }) {
+  const SWIPE_THRESHOLD = 0.15; // share of the element's width to drag before it changes
+  const FLICK_SPEED = 0.4;      // px per ms: a quick flick changes it even if it's short
+  const FLICK_MIN = 30;         // px: ...as long as it travelled at least this far
+
+  let pointerId = null;
+  let startX = 0;
+  let startY = 0;
+  let startTime = 0;
+  let dragX = 0;
+  let direction = null; // 'x' once it's clearly a sideways swipe, 'y' for scrolling
+
+  el.addEventListener('pointerdown', (e) => {
+    // ignore the mouse, and any second finger while one is already down
+    if (e.pointerType === 'mouse' || pointerId !== null || !enabled()) return;
+    pointerId = e.pointerId;
+    startX = e.clientX;
+    startY = e.clientY;
+    startTime = performance.now();
+    dragX = 0;
+    direction = null;
+    if (onStart) onStart();
+  });
+
+  el.addEventListener('pointermove', (e) => {
+    if (e.pointerId !== pointerId) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+
+    if (!direction) {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return; // too small to tell yet
+      direction = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+      if (direction === 'x') el.setPointerCapture(pointerId);
+    }
+    if (direction !== 'x') return;
+
+    dragX = dx;
+    if (onDrag) onDrag(dragX);
+  });
+
+  el.addEventListener('pointerup', (e) => {
+    if (e.pointerId !== pointerId) return;
+    pointerId = null;
+
+    if (direction === 'x') {
+      const distance = Math.abs(dragX);
+      const speed = distance / Math.max(1, performance.now() - startTime);
+      const farEnough = distance > el.clientWidth * SWIPE_THRESHOLD;
+      const flicked = speed > FLICK_SPEED && distance > FLICK_MIN;
+      if (farEnough || flicked) {
+        onSwipe(dragX < 0 ? 1 : -1);
+        return;
+      }
+    }
+    if (onCancel) onCancel();
+  });
+
+  // the browser took over (page scroll or pinch-zoom), so spring back
+  el.addEventListener('pointercancel', (e) => {
+    if (e.pointerId !== pointerId) return;
+    pointerId = null;
+    if (onCancel) onCancel();
+  });
+}
+
 document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
   const trackId = controls.getAttribute('data-featured-controls');
   const track = document.getElementById(trackId);
@@ -78,79 +155,25 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
   nextBtn.addEventListener('click', () => goTo(index + 1, true));
   prevBtn.addEventListener('click', () => goTo(index - 1, true));
 
-  // -----------------------------------------------------------------
-  // SWIPE (phones and tablets)
-  // Drag a slide sideways and it follows your finger. Let go past the
-  // threshold (or flick quickly) to move to the next/previous slide;
-  // otherwise it springs back. Up/down swipes still scroll the page
-  // (touch-action: pan-y in the CSS). Autoplay pauses while a finger
-  // is on the slider. Mouse users keep the arrows and dots.
-  // -----------------------------------------------------------------
-  const SWIPE_THRESHOLD = 0.15; // share of the slide width to drag before it changes
-  const FLICK_SPEED = 0.4;      // px per ms: a quick flick changes slide even if it's short
-  const FLICK_MIN = 30;         // px: ...as long as it travelled at least this far
-
-  let pointerId = null;
-  let startX = 0;
-  let startY = 0;
-  let startTime = 0;
-  let dragX = 0;
-  let direction = null; // 'x' once it's clearly a sideways swipe, 'y' for scrolling
-
-  const onDown = (e) => {
-    if (e.pointerType === 'mouse' || slides.length < 2) return;
-    pointerId = e.pointerId;
-    startX = e.clientX;
-    startY = e.clientY;
-    startTime = performance.now();
-    dragX = 0;
-    direction = null;
-    stopAutoplay();
-  };
-
-  const onMove = (e) => {
-    if (e.pointerId !== pointerId) return;
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-
-    if (!direction) {
-      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return; // too small to tell yet
-      direction = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
-      if (direction === 'x') {
-        track.setPointerCapture(pointerId);
-        track.classList.add('is-dragging');
-      }
-    }
-    if (direction !== 'x') return;
-
-    dragX = dx;
-    track.style.transform = `translateX(calc(${-index * 100}% + ${dragX}px))`;
-  };
-
-  const onUp = (e) => {
-    if (e.pointerId !== pointerId) return;
-    pointerId = null;
-    track.classList.remove('is-dragging');
-
-    if (direction === 'x') {
-      const distance = Math.abs(dragX);
-      const speed = distance / Math.max(1, performance.now() - startTime);
-      const farEnough = distance > track.clientWidth * SWIPE_THRESHOLD;
-      const flicked = speed > FLICK_SPEED && distance > FLICK_MIN;
-      if (farEnough || flicked) {
-        goTo(index + (dragX < 0 ? 1 : -1), true);
-        return;
-      }
-    }
-
-    render(); // spring back to the current slide
-    restartAutoplay();
-  };
-
-  track.addEventListener('pointerdown', onDown);
-  track.addEventListener('pointermove', onMove);
-  track.addEventListener('pointerup', onUp);
-  track.addEventListener('pointercancel', onUp);
+  // SWIPE (phones and tablets): the slide follows your finger, then
+  // either moves on or springs back. Autoplay pauses while touched.
+  addSwipe(track, {
+    enabled: () => slides.length > 1,
+    onStart: stopAutoplay,
+    onDrag: (dx) => {
+      track.classList.add('is-dragging'); // follow the finger with no easing
+      track.style.transform = `translateX(calc(${-index * 100}% + ${dx}px))`;
+    },
+    onSwipe: (dir) => {
+      track.classList.remove('is-dragging');
+      goTo(index + dir, true);
+    },
+    onCancel: () => {
+      track.classList.remove('is-dragging');
+      render(); // spring back to the current slide
+      restartAutoplay();
+    },
+  });
 
   render();
 
@@ -312,7 +335,8 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
 // WORK GRID LIGHTBOX
 // Clicking a work item enlarges its image. Each item can carry its own
 // small set of extra images (via data-images on the .work-item), which
-// are only reachable by clicking through the lightbox's prev/next/dots.
+// are only reachable through the lightbox's prev/next/dots, the arrow
+// keys, or by swiping on phones and tablets.
 // -------------------------------------------------------------------
 (() => {
   const lightbox = document.getElementById('lightbox');
@@ -423,6 +447,46 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
   nextBtn.addEventListener('click', showNext);
   prevBtn.addEventListener('click', showPrev);
   closeBtn.addEventListener('click', closeLightbox);
+
+  // SWIPE (phones and tablets): swipe anywhere on the open gallery.
+  // The picture follows your finger; on a real swipe the next image
+  // fades in from that side once it has loaded, otherwise it springs back.
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let swipeCount = 0; // so a quick second swipe cancels the first one's fade-in
+
+  addSwipe(lightbox, {
+    enabled: () => lightbox.classList.contains('active') && currentImages.length > 1,
+    onDrag: (dx) => {
+      media.style.transition = 'none';
+      media.style.transform = `translateX(${dx}px)`;
+    },
+    onSwipe: (dir) => {
+      const thisSwipe = ++swipeCount;
+      media.style.transition = 'none';
+      media.style.transform = '';
+      if (!reduceMotion) media.style.opacity = '0'; // hide the old image while the new one loads
+
+      if (dir > 0) showNext(); else showPrev();
+      if (reduceMotion) return;
+
+      const reveal = () => {
+        if (thisSwipe !== swipeCount) return;
+        media.style.opacity = '';
+        media.animate(
+          [
+            { transform: `translateX(${dir * 60}px)`, opacity: 0 },
+            { transform: 'none', opacity: 1 },
+          ],
+          { duration: 250, easing: 'ease-out' }
+        );
+      };
+      media.decode().then(reveal, reveal);
+    },
+    onCancel: () => {
+      media.style.transition = reduceMotion ? 'none' : 'transform 0.25s ease';
+      media.style.transform = ''; // spring back
+    },
+  });
 
   lightbox.addEventListener('click', (e) => {
     if (e.target === lightbox) closeLightbox();
