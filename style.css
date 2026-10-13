@@ -296,30 +296,31 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
 
 .section-head h2 { margin-bottom: 0; }
 
-/* 
+/*
    FEATURED WORK (full-screen auto-playing slide)
+   Background: the same spotlight as the Work section. The contour
+   texture is brightest at the spotlight and fades to the page colour
+   toward every edge (no hard top/bottom cut).
+     --spot-x / --spot-y : where the spotlight sits (phones have their
+                           own value in the phone section below)
  */
 .featured {
+  --spot-x: 50%;
+  --spot-y: 50%;
   position: relative;
   height: 100vh;
   min-height: 480px;
   overflow: hidden;
-  background-color: var(--color-bg-alt);
+  background-color: var(--color-bg);
   background-image:
-    linear-gradient(
-      to bottom,
-      rgba(13, 13, 13, 0.92) 0,
-      rgba(26, 26, 26, 0.45) 60px,
-      rgba(26, 26, 26, 0.45) calc(100% - 60px),
-      rgba(13, 13, 13, 0.92) 100%
-    ),
+    linear-gradient(to bottom, #0d0d0d 0, rgba(13, 13, 13, 0) 20%, rgba(13, 13, 13, 0) 80%, #0d0d0d 100%),
+    radial-gradient(ellipse 58% 60% at var(--spot-x) var(--spot-y), rgba(13, 13, 13, 0) 0%, rgba(13, 13, 13, 0.35) 40%, rgba(13, 13, 13, 0.9) 80%, #0d0d0d 100%),
     url('images/contours.webp');
-  background-size: 100% 100%, cover;
-  background-position: center, center;
-  background-repeat: no-repeat, no-repeat;
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
-    inset 0 0 90px rgba(255, 255, 255, 0.10);
+  /* fade layers overhang by 1px top and bottom so scaled displays
+     don't leave a thin unfaded line at the edge (same as #all-work) */
+  background-size: 100% calc(100% + 2px), 100% calc(100% + 2px), cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .featured-track {
@@ -412,9 +413,17 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
    underneath it rather than covering it.
  */
 @media (max-width: 720px) {
+  /* Fills the whole phone screen on load, with the slide (image, caption
+     and controls) centred in the space below the header, so featured
+     work is the first thing people see and Services starts below it. */
   .featured {
+    --spot-y: 55%; /* spotlight behind the centred slide */
     height: auto;
-    min-height: 0;
+    min-height: 100vh;  /* older browsers */
+    min-height: 100svh; /* screen height with the browser's address bar showing */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     padding-top: 72px; /* clears the fixed header so the top of each image isn't hidden */
   }
 
