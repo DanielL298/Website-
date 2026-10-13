@@ -8,7 +8,7 @@
 </head>
 <body>
 
-  <!-- NAV -->
+  <!-- Nav -->
   <header class="site-header">
     <div class="wrap header-inner">
       <a href="#" class="logo">
@@ -26,8 +26,7 @@
     </div>
   </header>
 
-  <!-- Featured work carousselle -->
-
+  <!-- Featured work carousel -->
   <section class="featured" id="work">
     <div class="featured-track" id="featured-track">
       <article class="featured-slide">
@@ -44,7 +43,7 @@
           <p> A recreation of the attic in which Paddington bear resides in the Paddington movie series.</p>
         </div>
       </article>
-      <!-- Slides 3–5: remove this comment wrapper to show them again
+      <!-- Slides 3-5
       <article class="featured-slide">
         <img class="card-media featured-media" src="images/featured-3.jpg" alt="Featured work 3">
         <div class="featured-caption">
@@ -108,7 +107,7 @@
           <p>We work alongside existing teams, studios or individuals, providing flexible 3D support throughout a project's development.</p>
           <span class="service-more" aria-hidden="true">Find out more <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
         </div>
-        <!-- Popup text: shown in red when the card is clicked. Add or remove <p> paragraphs freely. -->
+        <!-- Popup text -->
         <div class="service-detail" hidden>
           <p>Whether you're a studio that needs extra hands to hit a milestone, or a solo developer who needs a specialist for part of a project, we slot into your existing pipeline and work to your art direction, standards and deadlines.</p>
           <p>We can pick up anything from individual props and assets through to full modular environments, materials and technical workflows, and stay involved for as much or as little of the project as you need.</p>
@@ -173,7 +172,7 @@
 
  
 
-  <!-- MOTTO — sits directly under the carousel -->
+  <!-- Motto -->
   <section class="hero-caption">
     <div class="wrap">
       <img class="hero-motto" src="images/motto.png" alt="Your ideas forged in the crucible — 3D visualisation">
@@ -196,9 +195,9 @@
     </div>
   </section>
 
-  <!-- WORK: click a stack to open the gallery -->
+  <!-- Work -->
   <section class="section" id="all-work">
-    <!-- SEAM GRAPHIC -->
+    <!-- Seam graphic -->
     <div class="seam-graphic" aria-hidden="true">
       <span>Custom beam graphic goes here</span>
       <img src="images/seam-beam.png" alt=""
@@ -248,7 +247,7 @@
 
  
 
-  <!-- TEAM SECTION -->
+  <!-- Team -->
   <section class="section" id="team">
     <div class="wrap">
       <img class="hero-motto" src="images/Team.png" alt="Team">
@@ -308,7 +307,7 @@
       </article>
 
       <article class="team-card">
-        <!-- --zoom: 1 = normal, 1.2 = 20% closer. --focus: the point it zooms towards (x% y%) -->
+        <!-- --zoom / --focus crop the photo -->
         <div class="team-photo" style="--zoom: 3; --focus: 50% 35%;">
           <img src="images/team-3.jpg" alt="Daniel Lord">
         </div>
@@ -373,8 +372,7 @@
 <div class="beam-divider" aria-hidden="true">
   <img src="images/seam-beam.png" alt="">
 </div>
-    <!-- Footer -->
-  <!-- Contact us section -->
+  <!-- Footer / contact -->
     <footer class="site-footer">
   <section class="section" id="contact">
     <div class="wrap">
@@ -390,12 +388,11 @@
           <li><span class="contact-label">Studio</span><span> Wales</span></li>
         </ul>
 
-        <!-- MESSAGE FORM — sent through Web3Forms to the email address your access key was created with -->
+        <!-- Contact form (Web3Forms) -->
         <form class="contact-form" id="contact-form" action="https://api.web3forms.com/submit" method="POST">
-          <!-- Paste your Web3Forms access key between the quotes below -->
           <input type="hidden" name="access_key" value="8d35664a-6ac8-4909-b0ff-824efe448460">
           <input type="hidden" name="subject" value="New message from the Crwcible Studios website">
-          <!-- Spam trap: hidden from people, bots tend to tick it -->
+          <!-- Spam trap -->
           <input type="checkbox" name="botcheck" class="contact-botcheck" tabindex="-1" autocomplete="off" aria-hidden="true">
 
           <div class="contact-form-row">
@@ -425,7 +422,7 @@
     </div>
   </footer>
 
-  <!-- Work display -->
+  <!-- Work gallery -->
   <div class="lightbox" id="lightbox">
     <button class="lightbox-close" aria-label="Close" data-lightbox-close>&times;</button>
     <div class="lightbox-content">
@@ -445,7 +442,7 @@
     </div>
   </div>
 
-  <!-- Service details popup (filled in from whichever service card is clicked) -->
+  <!-- Service popup -->
   <div class="lightbox service-modal" id="service-modal" role="dialog" aria-modal="true" aria-labelledby="service-modal-title">
     <button class="lightbox-close" aria-label="Close" data-service-close>&times;</button>
     <div class="service-modal-box">

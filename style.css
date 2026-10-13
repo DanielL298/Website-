@@ -1,6 +1,4 @@
-/*
-   TOKENS — edit these to reskin the whole page
- */
+/* Variables */
 :root {
   --color-bg: #0d0d0d;
   --color-bg-alt: #000000;
@@ -12,8 +10,6 @@
   --font-display: "Helvetica Neue", Arial, sans-serif;
   --font-body: "Helvetica Neue", Arial, sans-serif;
 
-  /* page content caps out at a comfortable reading width,
-     even on very large / 4K monitors */
   --wrap-max: 1440px;
   --gutter: clamp(20px, 4vw, 64px);
 
@@ -30,11 +26,7 @@ body {
   color: var(--color-text);
   background: var(--color-bg);
   line-height: 1.5;
-  font-size: clamp(16px, 1vw, 18px); /* scales gently on huge screens */
-  /* Clips any stray horizontal overflow (e.g. an ember drifting past the
-     right edge — #tech intentionally doesn't clip so they can rise into
-     hero-caption) so the page never gains extra un-textured scroll space
-     past the edge of the contours background. */
+  font-size: clamp(16px, 1vw, 18px);
   overflow-x: hidden;
 }
 
@@ -51,9 +43,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
   padding-right: var(--gutter);
 }
 
-/* 
-   HEADER
- */
+/* Header */
 .site-header {
   position: fixed;
   top: 0;
@@ -80,8 +70,8 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
 
 .logo {
     display: flex;
-    align-items: center;  /* Vertically aligns the image and text */
-    gap: 10px;            /* Space between them */
+    align-items: center;
+    gap: 10px;
     text-decoration: none;
     color: white;
 }
@@ -111,20 +101,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
 .nav a:hover, .nav a:focus-visible {
   color: var(--color-text);
   border-color: #e53935;
-
-  /* Contours snippet — NOTE: no background-attachment:fixed here.
-     The header this lives in is animated with a transform (to slide
-     in/out), and any transformed ancestor turns "fixed" backgrounds
-     into a buggy, jumpy mess (the transform creates a new containing
-     block, so "fixed" stops meaning "relative to the viewport"). Using
-     the default (scroll) attachment keeps it stable — every link still
-     shows the same crop of the texture, it just won't shift with the
-     page scroll position.
-
-     background-size is a large percentage (not "cover") so the image
-     is blown up well past the button's size — cover was scaling the
-     image down to just barely fit, which showed almost the entire
-     graphic rather than a cropped section of it. */
+  /* contours texture */
   background-image:
     linear-gradient(rgba(13, 13, 13, 0.55), rgba(13, 13, 13, 0.55)),
     url('images/contours.webp');
@@ -132,10 +109,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
   background-position: center;
 }
 
-/* 
-   MOTTO / HERO CAPTION (sits in normal flow directly under the
-   full-screen carousel, rather than overlaid on top of it)
- */
+/* Title images */
 .hero-caption {
   padding: clamp(40px, 6vw, 80px) 0;
 }
@@ -147,21 +121,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
   margin: 0 auto;
 }
 
-/*
-   EMBERS — glowing particles that originate right at the seam between
-   Technology and Work below it (i.e. the bottom edge of #tech), then
-   drift up and fade as they rise through Technology into the hero/quote
-   section above — as if sparking off that seam and floating upward.
-   Particles are generated in JS (randomized size/speed/position/path)
-   and animated purely with CSS for performance. Each ember follows a
-   3-stage zigzag path (drift1 -> drift2 -> drift3) instead of a
-   straight line, plus randomized rotation, for a chaotic scatter
-   rather than a uniform rise.
-
-   Note: unlike a normal contained effect, #tech deliberately does NOT
-   clip overflow, so embers are free to travel above its own box and
-   visually pass into the hero-caption/quote section that precedes it.
- */
+/* Embers */
 #tech {
   position: relative;
 }
@@ -171,7 +131,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
   z-index: 1;
 }
 
-/* Soft glow strip marking the seam the embers spark off from */
+/* glow along the bottom edge */
 #tech::before {
   content: "";
   position: absolute;
@@ -193,10 +153,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  /* Embers can still rise up out of this box into the section above,
-     but are trimmed at the left/right screen edges. Without this, an
-     ember drifting off the side made phones widen the whole page, which
-     pushed fixed things (header, gallery close button) off-screen. */
+  /* clip sideways only, stops the page widening on phones */
   overflow-x: clip;
   overflow-y: visible;
 }
@@ -264,9 +221,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
   color: var(--color-text-muted);
 }
 
-/*
-   GENERIC SECTION
- */
+/* Sections */
 .section {
   padding: clamp(48px, 7vw, 96px) 0;
 }
@@ -301,14 +256,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
 
 .section-head h2 { margin-bottom: 0; }
 
-/*
-   FEATURED WORK (full-screen auto-playing slide)
-   Background: the same spotlight as the Work section. The contour
-   texture is brightest at the spotlight and fades to the page colour
-   toward every edge (no hard top/bottom cut).
-     --spot-x / --spot-y : where the spotlight sits (phones have their
-                           own value in the phone section below)
- */
+/* Featured carousel */
 .featured {
   --spot-x: 50%;
   --spot-y: 50%;
@@ -321,8 +269,6 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
     linear-gradient(to bottom, #0d0d0d 0, rgba(13, 13, 13, 0) 20%, rgba(13, 13, 13, 0) 80%, #0d0d0d 100%),
     radial-gradient(ellipse 58% 60% at var(--spot-x) var(--spot-y), rgba(13, 13, 13, 0) 0%, rgba(13, 13, 13, 0.35) 40%, rgba(13, 13, 13, 0.9) 80%, #0d0d0d 100%),
     url('images/contours.webp');
-  /* fade layers overhang by 1px top and bottom so scaled displays
-     don't leave a thin unfaded line at the edge (same as #all-work) */
   background-size: 100% calc(100% + 2px), 100% calc(100% + 2px), cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -332,15 +278,11 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
   display: flex;
   height: 100%;
   transition: transform 0.6s ease;
-  /* Up/down finger movement still scrolls the page and pinch-zoom still
-     works; sideways swipes are handed to index.js to change slide. */
-  touch-action: pan-y pinch-zoom;
+  touch-action: pan-y pinch-zoom; /* sideways swipes handled in JS */
   user-select: none;
   -webkit-user-select: none;
 }
 
-/* While a finger is dragging the slides, they follow it directly
-   instead of easing behind it. */
 .featured-track.is-dragging { transition: none; }
 
 .featured-media { -webkit-user-drag: none; }
@@ -410,26 +352,17 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
   border-color: var(--color-text);
 }
 
-/*
-   FEATURED WORK ON PHONES
-   A full-screen, cropped slide on a tall narrow phone screen only shows
-   a thin slice of each render. On phones the slider instead shows the
-   whole image at its own proportions, with the caption and controls
-   underneath it rather than covering it.
- */
+/* Featured carousel on phones: full image, caption and controls underneath */
 @media (max-width: 720px) {
-  /* Fills the whole phone screen on load, with the slide (image, caption
-     and controls) centred in the space below the header, so featured
-     work is the first thing people see and Services starts below it. */
   .featured {
-    --spot-y: 55%; /* spotlight behind the centred slide */
+    --spot-y: 55%;
     height: auto;
-    min-height: 100vh;  /* older browsers */
-    min-height: 100svh; /* screen height with the browser's address bar showing */
+    min-height: 100vh; /* fallback */
+    min-height: 100svh;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding-top: 72px; /* clears the fixed header so the top of each image isn't hidden */
+    padding-top: 72px; /* header height */
   }
 
   .featured-track {
@@ -439,7 +372,6 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
 
   .featured-slide { height: auto; }
 
-  /* whole image, nothing cropped */
   .featured .featured-media {
     height: auto;
     aspect-ratio: auto;
@@ -460,7 +392,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
     padding: 12px 0 24px;
   }
 
-  /* bigger, easier-to-tap dots (the visible dot stays the same size) */
+  /* bigger tap area for the dots */
   .featured-controls .featured-dots { gap: 16px; }
 
   .featured-controls .featured-dots .dot { position: relative; }
@@ -476,9 +408,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
   .featured-track { transition: none; }
 }
 
-/*
-   CARD MEDIA / PLACEHOLDER (shared)
- */
+/* Card media */
 .card-media {
   aspect-ratio: 4 / 3;
   border-radius: var(--radius);
@@ -487,8 +417,6 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
 
 .card-media.square { aspect-ratio: 1 / 1; }
 
-/* Once a placeholder div is swapped for a real <img class="card-media">,
-   this makes it fill the box and crop nicely instead of stretching. */
 img.card-media,
 .lightbox-media img {
   width: 100%;
@@ -499,14 +427,12 @@ img.card-media,
 
 .card-media2.square { aspect-ratio: 1 / 1; }
 
-/* Once a placeholder div is swapped for a real <img class="card-media">,
-   this makes it fill the box and crop nicely instead of stretching. */
 img.card-media2,
 .lightbox-media img {
   width: 150%;
   height: 100%;
-  object-fit: contain; 
-  display: block; 
+  object-fit: contain;
+  display: block;
 }
 
 .placeholder {
@@ -521,9 +447,7 @@ img.card-media2,
   text-transform: uppercase;
 }
 
-/*
-   WORK STACKS (fanned images, click to open the lightbox)
- */
+/* Work stacks */
 .work-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
@@ -544,7 +468,7 @@ img.card-media2,
   cursor: zoom-in;
 }
 
-/* the front image (your real cover photo) */
+/* cover image */
 .work-stack .card-media {
   position: absolute;
   inset: 0;
@@ -567,7 +491,7 @@ img.card-media2,
   .work-stack:focus-visible .card-media { transform: none; }
 }
 
-/* the two fanned layers behind it (filled with the next two images by index.js) */
+/* fanned images behind the cover (set in index.js) */
 .work-stack::before,
 .work-stack::after {
   content: "";
@@ -596,7 +520,7 @@ img.card-media2,
   transform: rotate(4deg) translateX(12px);
 }
 
-/* mirror the fan on every second project */
+/* mirror every second stack */
 .work-item:nth-child(even) .work-stack::before { transform: rotate(5deg) translateX(14px); }
 .work-item:nth-child(even) .work-stack::after  { transform: rotate(-4deg) translateX(-12px); }
 
@@ -617,11 +541,7 @@ img.card-media2,
   font-size: 0.9rem;
 }
 
-/*
-   WORK SECTION BACKGROUND
-   Spotlight: the contour texture is brightest behind the projects and
-   fades to the page colour toward every edge (no hard top/bottom cut)
- */
+/* Work section background */
 #all-work {
   position: relative;
   background-color: #0d0d0d;
@@ -629,22 +549,12 @@ img.card-media2,
     linear-gradient(to bottom, #0d0d0d 0, rgba(13, 13, 13, 0) 20%, rgba(13, 13, 13, 0) 80%, #0d0d0d 100%),
     radial-gradient(ellipse 58% 60% at 50% 58%, rgba(13, 13, 13, 0) 0%, rgba(13, 13, 13, 0.35) 40%, rgba(13, 13, 13, 0.9) 80%, #0d0d0d 100%),
     url('images/contours.webp');
-  /* The two fade layers overhang the section by 1px top and bottom. Without
-     this, on scaled displays (e.g. Windows at 125-175%) they can round a
-     pixel short and leave a thin line of unfaded contours at the edge. */
   background-size: 100% calc(100% + 2px), 100% calc(100% + 2px), cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
-/*
-   SEAM GRAPHIC
-   Sits just below the line between Technology and this section.
-   Save the beam as images/seam-beam.png and it replaces the dashed
-   placeholder automatically (its own proportions are kept).
-     --seam-graphic-offset : push it further down (e.g. 20px)
-     --seam-graphic-width  : make it narrower than the full page (e.g. 80%)
- */
+/* Seam graphic */
 .seam-graphic {
   position: absolute;
   top: 0;
@@ -663,7 +573,7 @@ img.card-media2,
   object-fit: fill;
 }
 
-/* placeholder look, only while no image has loaded */
+/* placeholder until the image loads */
 .seam-graphic:not(.has-image) {
   height: clamp(48px, 6vw, 96px);
   display: flex;
@@ -679,7 +589,7 @@ img.card-media2,
 
 .seam-graphic.has-image span { display: none; }
 
-/* BEAM DIVIDER */
+/* Beam divider */
 .beam-divider {
   width: 100%;
   height: clamp(55px, 6vw, 90px);
@@ -701,9 +611,7 @@ img.card-media2,
   z-index: 1;
 }
 
-/* 
-   LIGHTBOX
- */
+/* Lightbox */
 .lightbox {
   position: fixed;
   inset: 0;
@@ -723,8 +631,6 @@ img.card-media2,
   pointer-events: auto;
 }
 
-/* Work gallery: sideways swipes go to index.js to change image;
-   pinch-zoom still works for a closer look. */
 #lightbox {
   touch-action: pan-y pinch-zoom;
   user-select: none;
@@ -773,9 +679,7 @@ img.card-media2,
 
 .lightbox-close:hover { background: var(--color-border); }
 
-/* 
-   WORK LIGHTBOX (per-item image gallery)
-*/
+/* Work gallery */
 .lightbox-media {
   width: 100%;
   font-size: 1.1rem;
@@ -803,7 +707,6 @@ img.card-media2,
   gap: 20px;
 }
 
-/* No circular button chrome for the lightbox close/prev/next controls */
 .lightbox-close,
 .lightbox-prev,
 .lightbox-next {
@@ -819,9 +722,7 @@ img.card-media2,
   opacity: 0.65;
 }
 
-/* 
-   SHARED CONTROLS (buttons used by featured slider)
- */
+/* Arrow buttons */
 .ctrl {
   width: 44px;
   height: 44px;
@@ -848,9 +749,7 @@ img.card-media2,
   transition: filter 0.25s ease;
 }
 
-/* Ember-orange glow flare on hover/focus — matches the .ember particle
-   colour (#ff8a3d) instead of a solid filled button, so the controls
-   read as "sparking" rather than boxy UI chrome. */
+/* ember glow on hover */
 .ctrl:hover,
 .ctrl:focus-visible {
   color: #ffb17a;
@@ -867,9 +766,7 @@ img.card-media2,
   outline-offset: 4px;
 }
 
-/*
-   LOGO GRID
- */
+/* Logo grid */
 .logo-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -891,8 +788,6 @@ img.card-media2,
   overflow: hidden;
 }
 
-/* Logos are shown whole (not cropped) — swap in real logo files any size,
-   they'll scale down to fit the box. */
 .logo-item img {
   max-width: 70%;
   max-height: 70%;
@@ -901,9 +796,7 @@ img.card-media2,
   object-fit: contain;
 }
 
-/* Plain variant — no grid lines, no tile backgrounds. Just drop in
-   transparent (PNG/SVG) logo files and they'll sit directly on the
-   page background, evenly spaced. */
+/* plain version, no tiles */
 .logo-grid--plain {
   background: none;
   border: none;
@@ -927,12 +820,7 @@ img.card-media2,
   opacity: 1;
 }*/
 
-/*
-   SERVICE CARDS (2 x 2, full width)
-   On hover the card itself stays put — only the image zooms inside its
-   frame, and the red border/glow brightens. Scaling the whole card made
-   the text shift and blur, so that's deliberately avoided.
- */
+/* Service cards */
 .service-cards {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -959,13 +847,13 @@ img.card-media2,
 
 .service-media {
   aspect-ratio: 16 / 9;
-  overflow: hidden; /* crops the image as it zooms */
+  overflow: hidden;
 }
 
 .service-media img {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* whole image shows inside the box, no cropping */
+  object-fit: contain;
   transition: transform 0.5s ease;
 }
 
@@ -1014,11 +902,7 @@ img.card-media2,
   .service-card:focus-visible .service-media img { transform: none; }
 }
 
-/*
-   SERVICE POPUP — click a service card to open it. Reuses the work
-   lightbox's dark overlay and close button; the box is styled like
-   the red-edged service cards, with the description in red.
- */
+/* Service popup */
 .service-card { cursor: pointer; }
 
 .service-more {
@@ -1045,7 +929,6 @@ img.card-media2,
 .service-card:hover .service-more svg,
 .service-card:focus-visible .service-more svg { transform: translateX(4px); }
 
-/* hidden while closed so its close button can't be tabbed to */
 .service-modal {
   visibility: hidden;
   transition: opacity 0.2s ease, visibility 0.2s ease;
@@ -1053,7 +936,7 @@ img.card-media2,
 
 .service-modal.active {
   visibility: visible;
-  transition: opacity 0.2s ease, visibility 0s; /* show straight away so the close button can take focus */
+  transition: opacity 0.2s ease, visibility 0s;
 }
 
 .service-modal-box {
@@ -1088,14 +971,13 @@ img.card-media2,
 
 .service-modal-text p {
   margin: 0 0 14px;
-  color: #ff5a52; /* the red description text */
+  color: #ff5a52;
   font-size: 1.05rem;
   line-height: 1.7;
 }
 
 .service-modal-text p:last-child { margin-bottom: 0; }
 
-/* Phones: leave room above the box for the close button */
 @media (max-width: 720px) {
   .service-modal { padding: 76px 16px 24px; }
 }
@@ -1106,12 +988,7 @@ img.card-media2,
   .service-modal-box { transform: none; }
 }
 
-/*
-   VALUES GRID
- */
-/* Centre the "Values" heading image. Its wrapper is a .section-head
-   flex row (which pins it left), and on phones .section-head turns into
-   a left-aligned column, so both directions are centred here. */
+/* Values */
 #values .section-head {
   justify-content: center;
   align-items: center;
@@ -1164,9 +1041,7 @@ img.card-media2,
   .value-item { animation: none; }
 }
 
-/*
-   TEAM CARDS (red box per member, photo breaks out on the left, no hover effects)
- */
+/* Team */
 .team-list {
   --photo-w: clamp(150px, 16vw, 260px);
   width: 60%;
@@ -1186,7 +1061,6 @@ img.card-media2,
   align-items: center;
 }
 
-/* The frame — keeps its size and clips the photo inside it */
 .team-photo {
   position: absolute;
   top: -28px;
@@ -1199,7 +1073,7 @@ img.card-media2,
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
-/* The photo — set --zoom / --focus on a .team-photo to crop in closer */
+/* --zoom and --focus can be set on .team-photo to crop in */
 .team-photo img {
   width: 100%;
   height: 100%;
@@ -1244,7 +1118,6 @@ img.card-media2,
   border-radius: var(--radius);
 }
 
-/* Email + ArtStation buttons sit side by side, wrapping on small screens */
 .team-links {
   display: flex;
   flex-wrap: wrap;
@@ -1254,7 +1127,7 @@ img.card-media2,
 .team-link {
   display: inline-flex;
   max-width: 100%;
-  overflow-wrap: anywhere; /* long email addresses can wrap on phones */
+  overflow-wrap: anywhere;
   align-items: center;
   gap: 8px;
   padding: 8px 14px;
@@ -1274,13 +1147,11 @@ img.card-media2,
   stroke-linejoin: round;
 }
 
-/* keyboard focus only (no hover effects) */
 .team-link:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 3px;
 }
 
-/* Phones: one column, photo still pokes out of the top-left corner */
 @media (max-width: 720px) {
   .team-list {
     width: calc(100% - 2 * var(--gutter));
@@ -1302,10 +1173,7 @@ img.card-media2,
   }
 }
 
-/* 
-   CONTACT
- */
-/* everything in Get in touch is centred */
+/* Contact */
 .contact-info {
   text-align: center;
 }
@@ -1353,13 +1221,12 @@ img.card-media2,
   font-size: 0.75rem;
   color: var(--color-text-muted);
 }
-/*
-   CONTACT FORM (Web3Forms) — red-edged fields to match the service/value cards
- */
+
+/* Contact form */
 .contact-form {
   margin: 40px auto 0;
   max-width: 680px;
-  text-align: left; /* field labels stay left-aligned above their boxes */
+  text-align: left;
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -1443,13 +1310,14 @@ img.card-media2,
 .contact-status.is-success { color: #fff; font-size: 1.1rem; }
 .contact-status.is-error { color: #ff8a80; }
 
-/* Once sent, only the thank-you message is left showing */
+/* hide the form once it's sent */
 .contact-form.is-sent > :not(.contact-status) { display: none; }
 
 @media (max-width: 720px) {
   .contact-form-row { grid-template-columns: 1fr; }
 }
 
+/* Footer */
 .site-footer {
   border-top: 1px solid var(--color-border);
   padding: 32px 0;
@@ -1465,15 +1333,13 @@ img.card-media2,
   color: var(--color-text-muted);
 }
 
-/* 
-   RESPONSIVE
- */
+/* Responsive */
 @media (max-width: 720px) {
-  .nav { display: none; } /* swap for a mobile menu when ready */
+  .nav { display: none; } /* TODO: mobile menu */
   .section-head { flex-direction: column; align-items: flex-start; gap: 16px; }
 }
 
-/* Respect reduced motion */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .ctrl { transition: none; }

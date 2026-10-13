@@ -1,51 +1,33 @@
-// Full-screen "featured" slider: one slide fills the screen, auto-plays,
-// and can be advanced manually with the prev/next buttons or dots.
-
-// -------------------------------------------------------------------
-// HEADER VISIBILITY
-// Header stays hidden while at the very top of the page, and slides
-// in as soon as the user scrolls down at all.
-// -------------------------------------------------------------------
+// Header
 (() => {
   const header = document.querySelector('.site-header');
   if (!header) return;
 
-  const SHOW_THRESHOLD = -10; // px scrolled before header appears
+  const SHOW_THRESHOLD = -10; // px scrolled before it shows
 
   const updateHeader = () => {
     header.classList.toggle('is-visible', window.scrollY > SHOW_THRESHOLD);
   };
 
-  updateHeader(); // set correct state on load (e.g. reload mid-page)
+  updateHeader();
   window.addEventListener('scroll', updateHeader, { passive: true });
 })();
 
-// -------------------------------------------------------------------
-// SWIPE HELPER (shared by the featured slider and the work gallery)
-// Watches an element for sideways finger swipes. Up/down movement and
-// pinch-zoom are left to the browser (touch-action in the CSS), and
-// mouse input is ignored, since desktop users have the arrows, dots
-// and arrow keys. Hooks:
-//   enabled()     return false to ignore touches (e.g. only one image)
-//   onStart()     finger went down
-//   onDrag(dx)    finger has moved sideways by dx pixels
-//   onSwipe(dir)  let go after a real swipe: 1 = next, -1 = previous
-//   onCancel()    let go without a swipe, so spring back
-// -------------------------------------------------------------------
+// Touch swipe, used by the featured carousel and the work gallery
 function addSwipe(el, { enabled = () => true, onStart, onDrag, onSwipe, onCancel }) {
-  const SWIPE_THRESHOLD = 0.15; // share of the element's width to drag before it changes
-  const FLICK_SPEED = 0.4;      // px per ms: a quick flick changes it even if it's short
-  const FLICK_MIN = 30;         // px: ...as long as it travelled at least this far
+  const SWIPE_THRESHOLD = 0.15; // fraction of the width
+  const FLICK_SPEED = 0.4;      // px per ms
+  const FLICK_MIN = 30;         // px
 
   let pointerId = null;
   let startX = 0;
   let startY = 0;
   let startTime = 0;
   let dragX = 0;
-  let direction = null; // 'x' once it's clearly a sideways swipe, 'y' for scrolling
+  let direction = null;
 
   el.addEventListener('pointerdown', (e) => {
-    // ignore the mouse, and any second finger while one is already down
+    // touch only, one finger at a time
     if (e.pointerType === 'mouse' || pointerId !== null || !enabled()) return;
     pointerId = e.pointerId;
     startX = e.clientX;
@@ -62,7 +44,7 @@ function addSwipe(el, { enabled = () => true, onStart, onDrag, onSwipe, onCancel
     const dy = e.clientY - startY;
 
     if (!direction) {
-      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return; // too small to tell yet
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
       direction = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
       if (direction === 'x') el.setPointerCapture(pointerId);
     }
@@ -89,7 +71,7 @@ function addSwipe(el, { enabled = () => true, onStart, onDrag, onSwipe, onCancel
     if (onCancel) onCancel();
   });
 
-  // the browser took over (page scroll or pinch-zoom), so spring back
+  // browser took over (scrolling or pinch-zoom)
   el.addEventListener('pointercancel', (e) => {
     if (e.pointerId !== pointerId) return;
     pointerId = null;
@@ -97,6 +79,7 @@ function addSwipe(el, { enabled = () => true, onStart, onDrag, onSwipe, onCancel
   });
 }
 
+// Featured carousel
 document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
   const trackId = controls.getAttribute('data-featured-controls');
   const track = document.getElementById(trackId);
@@ -109,7 +92,7 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
   const dotsWrap = controls.querySelector('.featured-dots');
 
   let index = 0;
-  const AUTOPLAY_DELAY = 4000; // ms per slide
+  const AUTOPLAY_DELAY = 4000; // ms
   let autoplayTimer = null;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -147,7 +130,6 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
     autoplayTimer = null;
   };
 
-  // (never restarts autoplay for visitors who've asked for reduced motion)
   const restartAutoplay = () => {
     if (!prefersReducedMotion) startAutoplay();
   };
@@ -155,13 +137,12 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
   nextBtn.addEventListener('click', () => goTo(index + 1, true));
   prevBtn.addEventListener('click', () => goTo(index - 1, true));
 
-  // SWIPE (phones and tablets): the slide follows your finger, then
-  // either moves on or springs back. Autoplay pauses while touched.
+  // Swipe
   addSwipe(track, {
     enabled: () => slides.length > 1,
     onStart: stopAutoplay,
     onDrag: (dx) => {
-      track.classList.add('is-dragging'); // follow the finger with no easing
+      track.classList.add('is-dragging');
       track.style.transform = `translateX(calc(${-index * 100}% + ${dx}px))`;
     },
     onSwipe: (dir) => {
@@ -170,7 +151,7 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
     },
     onCancel: () => {
       track.classList.remove('is-dragging');
-      render(); // spring back to the current slide
+      render(); // snap back
       restartAutoplay();
     },
   });
@@ -182,14 +163,7 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
   }
 });
 
-// -------------------------------------------------------------------
-// EMBERS
-// Glowing particles that spark off the seam between Technology and
-// Work below it (the bottom edge of #tech) and rise/scatter up
-// through Technology into the hero-caption section above. Each ember follows a randomized 3-stage zigzag path
-// (rather than a straight line) for a chaotic, fire-like scatter.
-// Skips entirely if the user prefers reduced motion.
-// -------------------------------------------------------------------
+// Embers
 (() => {
   const container = document.getElementById('embers');
   if (!container) return;
@@ -206,13 +180,11 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
     const ember = document.createElement('span');
     ember.className = 'ember';
 
-    const size = rand(1.5, 6.5).toFixed(1); // varied spark sizes
-    const x = rand(0, 100).toFixed(1); // spawn position across the seam
-    const fall = rand(160, 420).toFixed(0); // how far it falls before fading out
+    const size = rand(1.5, 6.5).toFixed(1);
+    const x = rand(0, 100).toFixed(1);
+    const fall = rand(160, 420).toFixed(0);
 
-    // Three independent sideways offsets create a zigzag path instead
-    // of a straight drift, with each ember free to swing a different
-    // direction/amount at each stage.
+    // zigzag path
     const drift1 = rand(-70, 70).toFixed(0);
     const drift2 = rand(-110, 110).toFixed(0);
     const drift3 = rand(-150, 150).toFixed(0);
@@ -221,8 +193,8 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
     const spin2 = rand(-120, 120).toFixed(0);
     const spin3 = rand(-160, 160).toFixed(0);
 
-    const duration = rand(3.5, 11).toFixed(1); // varied fall speeds
-    const delay = -rand(0, 11).toFixed(1); // negative = staggered/random start
+    const duration = rand(3.5, 11).toFixed(1);
+    const delay = -rand(0, 11).toFixed(1); // negative so they start staggered
     const peakOpacity = rand(0.3, 0.85).toFixed(2);
     const ease = EASES[Math.floor(Math.random() * EASES.length)];
 
@@ -245,19 +217,12 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
 
   container.appendChild(frag);
 
-  // -----------------------------------------------------------------
-  // CURSOR REPEL
-  // Embers gently drift away from the mouse when it gets close, then
-  // ease back onto their normal path once it moves off. This uses the
-  // separate CSS `translate` property, which stacks on top of the
-  // keyframe `transform`, so the rise/zigzag animation keeps running
-  // untouched underneath. Mouse/trackpad only — touch screens skip it.
-  // -----------------------------------------------------------------
+  // Push embers away from the cursor (mouse only)
   if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
-  const REPEL_RADIUS = 110;  // px: how close the cursor has to get before embers react
-  const REPEL_STRENGTH = 26; // px: the furthest an ember gets nudged (keep it small for subtle)
-  const REPEL_EASE = 0.08;   // 0-1: lower = softer, lazier drift; higher = snappier
+  const REPEL_RADIUS = 110;  // px
+  const REPEL_STRENGTH = 26; // px
+  const REPEL_EASE = 0.08;   // lower = softer
 
   const OFF_PAGE = -99999;
   const particles = Array.from(container.children).map((el) => ({ el, x: 0, y: 0 }));
@@ -270,14 +235,11 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
     frame = null;
     if (!inView) return;
 
-    // Read every ember's position first, then write, so the browser
-    // only has to work out the layout once per frame.
     const rects = particles.map((p) => p.el.getBoundingClientRect());
     let settling = false;
 
     particles.forEach((p, i) => {
       const r = rects[i];
-      // where the ember would be without our nudge
       const cx = r.left + r.width / 2 - p.x;
       const cy = r.top + r.height / 2 - p.y;
       const dx = cx - mouseX;
@@ -287,7 +249,6 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
       let targetX = 0;
       let targetY = 0;
       if (dist < REPEL_RADIUS) {
-        // strongest right under the cursor, fading smoothly to nothing at the edge
         const force = (1 - dist / REPEL_RADIUS) ** 2 * REPEL_STRENGTH;
         targetX = (dx / dist) * force;
         targetY = (dy / dist) * force;
@@ -300,8 +261,6 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
       p.el.style.translate = `${p.x.toFixed(2)}px ${p.y.toFixed(2)}px`;
     });
 
-    // Keep going while the cursor is on the page (embers keep rising
-    // into it even if it's still), or until every ember has eased back.
     if (mouseX !== OFF_PAGE || settling) frame = requestAnimationFrame(tick);
   };
 
@@ -315,7 +274,7 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
     start();
   }, { passive: true });
 
-  // cursor left the browser window: let the embers drift back
+  // cursor left the window
   window.addEventListener('mouseout', (e) => {
     if (!e.relatedTarget) {
       mouseX = OFF_PAGE;
@@ -323,21 +282,14 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
     }
   });
 
-  // Only run while the embers are on (or near) the screen. The margin
-  // covers the embers that rise up out of #tech into the section above.
+  // only run while the embers are near the screen
   new IntersectionObserver(([entry]) => {
     inView = entry.isIntersecting;
     start();
   }, { rootMargin: '450px 0px' }).observe(container);
 })();
 
-// -------------------------------------------------------------------
-// WORK GRID LIGHTBOX
-// Clicking a work item enlarges its image. Each item can carry its own
-// small set of extra images (via data-images on the .work-item), which
-// are only reachable through the lightbox's prev/next/dots, the arrow
-// keys, or by swiping on phones and tablets.
-// -------------------------------------------------------------------
+// Work gallery
 (() => {
   const lightbox = document.getElementById('lightbox');
   if (!lightbox) return;
@@ -412,24 +364,21 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
     const cover = item.querySelector('.card-media');
     if (!cover) return;
 
-    // The whole fanned stack is clickable (falls back to the cover image).
     const trigger = item.querySelector('.work-stack') || cover;
 
-    // All images for this project live in data-images; they are only
-    // revealed once the lightbox is open.
     const raw = item.getAttribute('data-images');
     const images = raw
       ? raw.split(',').map((s) => s.trim()).filter(Boolean)
       : [cover.getAttribute('src')];
     const title = item.querySelector('h3')?.textContent.trim() || '';
 
-    // Image count under the title, worked out automatically.
+    // image count
     const countEl = item.querySelector('.work-count');
     if (countEl) {
       countEl.textContent = `${images.length} image${images.length === 1 ? '' : 's'}`;
     }
 
-    // Fill the two fanned layers behind the cover with the next two images.
+    // fanned images behind the cover
     const toUrl = (src) => `url("${new URL(src, document.baseURI).href}")`;
     if (images[1]) trigger.style.setProperty('--back-1', toUrl(images[1]));
     if (images[2]) trigger.style.setProperty('--back-2', toUrl(images[2]));
@@ -448,11 +397,9 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
   prevBtn.addEventListener('click', showPrev);
   closeBtn.addEventListener('click', closeLightbox);
 
-  // SWIPE (phones and tablets): swipe anywhere on the open gallery.
-  // The picture follows your finger; on a real swipe the next image
-  // fades in from that side once it has loaded, otherwise it springs back.
+  // Swipe
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let swipeCount = 0; // so a quick second swipe cancels the first one's fade-in
+  let swipeCount = 0;
 
   addSwipe(lightbox, {
     enabled: () => lightbox.classList.contains('active') && currentImages.length > 1,
@@ -464,11 +411,12 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
       const thisSwipe = ++swipeCount;
       media.style.transition = 'none';
       media.style.transform = '';
-      if (!reduceMotion) media.style.opacity = '0'; // hide the old image while the new one loads
+      if (!reduceMotion) media.style.opacity = '0';
 
       if (dir > 0) showNext(); else showPrev();
       if (reduceMotion) return;
 
+      // fade the new image in once it's loaded
       const reveal = () => {
         if (thisSwipe !== swipeCount) return;
         media.style.opacity = '';
@@ -484,7 +432,7 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
     },
     onCancel: () => {
       media.style.transition = reduceMotion ? 'none' : 'transform 0.25s ease';
-      media.style.transform = ''; // spring back
+      media.style.transform = ''; // snap back
     },
   });
 
@@ -500,12 +448,7 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
   });
 })();
 
-// -------------------------------------------------------------------
-// CONTACT FORM (Web3Forms)
-// Sends the message without leaving the page, then swaps the form for
-// a thank-you line. If anything fails, visitors are pointed to the
-// studio email instead.
-// -------------------------------------------------------------------
+// Contact form (Web3Forms)
 (() => {
   const form = document.getElementById('contact-form');
   if (!form) return;
@@ -550,12 +493,7 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
   });
 })();
 
-// -------------------------------------------------------------------
-// SERVICE POPUP
-// Clicking (or pressing Enter on) a service card opens a box with its
-// image, title and the longer description from its .service-detail.
-// Close with the X, by clicking outside the box, or with Escape.
-// -------------------------------------------------------------------
+// Service popup
 (() => {
   const modal = document.getElementById('service-modal');
   if (!modal) return;
@@ -576,7 +514,6 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
     numEl.textContent = card.querySelector('.service-num')?.textContent || '';
     titleEl.textContent = card.querySelector('h3')?.textContent || '';
 
-    // Long description if there is one, otherwise the card's short text
     const detail = card.querySelector('.service-detail');
     if (detail) {
       textEl.innerHTML = detail.innerHTML;
