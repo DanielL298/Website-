@@ -34,6 +34,7 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
   let index = 0;
   const AUTOPLAY_DELAY = 4000; // ms per slide
   let autoplayTimer = null;
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Build dots
   const dots = slides.map((_, i) => {
@@ -69,16 +70,90 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
     autoplayTimer = null;
   };
 
+  // (never restarts autoplay for visitors who've asked for reduced motion)
   const restartAutoplay = () => {
-    startAutoplay();
+    if (!prefersReducedMotion) startAutoplay();
   };
 
   nextBtn.addEventListener('click', () => goTo(index + 1, true));
   prevBtn.addEventListener('click', () => goTo(index - 1, true));
 
+  // -----------------------------------------------------------------
+  // SWIPE (phones and tablets)
+  // Drag a slide sideways and it follows your finger. Let go past the
+  // threshold (or flick quickly) to move to the next/previous slide;
+  // otherwise it springs back. Up/down swipes still scroll the page
+  // (touch-action: pan-y in the CSS). Autoplay pauses while a finger
+  // is on the slider. Mouse users keep the arrows and dots.
+  // -----------------------------------------------------------------
+  const SWIPE_THRESHOLD = 0.15; // share of the slide width to drag before it changes
+  const FLICK_SPEED = 0.4;      // px per ms: a quick flick changes slide even if it's short
+  const FLICK_MIN = 30;         // px: ...as long as it travelled at least this far
+
+  let pointerId = null;
+  let startX = 0;
+  let startY = 0;
+  let startTime = 0;
+  let dragX = 0;
+  let direction = null; // 'x' once it's clearly a sideways swipe, 'y' for scrolling
+
+  const onDown = (e) => {
+    if (e.pointerType === 'mouse' || slides.length < 2) return;
+    pointerId = e.pointerId;
+    startX = e.clientX;
+    startY = e.clientY;
+    startTime = performance.now();
+    dragX = 0;
+    direction = null;
+    stopAutoplay();
+  };
+
+  const onMove = (e) => {
+    if (e.pointerId !== pointerId) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+
+    if (!direction) {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return; // too small to tell yet
+      direction = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+      if (direction === 'x') {
+        track.setPointerCapture(pointerId);
+        track.classList.add('is-dragging');
+      }
+    }
+    if (direction !== 'x') return;
+
+    dragX = dx;
+    track.style.transform = `translateX(calc(${-index * 100}% + ${dragX}px))`;
+  };
+
+  const onUp = (e) => {
+    if (e.pointerId !== pointerId) return;
+    pointerId = null;
+    track.classList.remove('is-dragging');
+
+    if (direction === 'x') {
+      const distance = Math.abs(dragX);
+      const speed = distance / Math.max(1, performance.now() - startTime);
+      const farEnough = distance > track.clientWidth * SWIPE_THRESHOLD;
+      const flicked = speed > FLICK_SPEED && distance > FLICK_MIN;
+      if (farEnough || flicked) {
+        goTo(index + (dragX < 0 ? 1 : -1), true);
+        return;
+      }
+    }
+
+    render(); // spring back to the current slide
+    restartAutoplay();
+  };
+
+  track.addEventListener('pointerdown', onDown);
+  track.addEventListener('pointermove', onMove);
+  track.addEventListener('pointerup', onUp);
+  track.addEventListener('pointercancel', onUp);
+
   render();
 
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!prefersReducedMotion) {
     startAutoplay();
   }

@@ -326,7 +326,18 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
   display: flex;
   height: 100%;
   transition: transform 0.6s ease;
+  /* Up/down finger movement still scrolls the page; sideways swipes
+     are handed to index.js to change slide. */
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
 }
+
+/* While a finger is dragging the slides, they follow it directly
+   instead of easing behind it. */
+.featured-track.is-dragging { transition: none; }
+
+.featured-media { -webkit-user-drag: none; }
 
 .featured-slide {
   position: relative;
@@ -391,6 +402,64 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
 .featured-dots .dot.active {
   background: var(--color-text);
   border-color: var(--color-text);
+}
+
+/*
+   FEATURED WORK ON PHONES
+   A full-screen, cropped slide on a tall narrow phone screen only shows
+   a thin slice of each render. On phones the slider instead shows the
+   whole image at its own proportions, with the caption and controls
+   underneath it rather than covering it.
+ */
+@media (max-width: 720px) {
+  .featured {
+    height: auto;
+    min-height: 0;
+    padding-top: 72px; /* clears the fixed header so the top of each image isn't hidden */
+  }
+
+  .featured-track {
+    height: auto;
+    align-items: flex-start;
+  }
+
+  .featured-slide { height: auto; }
+
+  /* whole image, nothing cropped */
+  .featured .featured-media {
+    height: auto;
+    aspect-ratio: auto;
+    object-fit: contain;
+  }
+
+  .featured-caption {
+    position: static;
+    margin: 16px var(--gutter) 0;
+    padding: 0;
+    background: none;
+  }
+
+  .featured-caption h3 { font-size: 1.15rem; }
+
+  .featured-controls {
+    position: static;
+    padding: 12px 0 24px;
+  }
+
+  /* bigger, easier-to-tap dots (the visible dot stays the same size) */
+  .featured-controls .featured-dots { gap: 16px; }
+
+  .featured-controls .featured-dots .dot { position: relative; }
+
+  .featured-controls .featured-dots .dot::before {
+    content: "";
+    position: absolute;
+    inset: -8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .featured-track { transition: none; }
 }
 
 /*
