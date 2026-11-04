@@ -1,85 +1,25 @@
-// Header
+// Full-screen "featured" slider: one slide fills the screen, auto-plays,
+// and can be advanced manually with the prev/next buttons or dots.
+
+// -------------------------------------------------------------------
+// HEADER VISIBILITY
+// Header stays hidden while at the very top of the page, and slides
+// in as soon as the user scrolls down at all.
+// -------------------------------------------------------------------
 (() => {
   const header = document.querySelector('.site-header');
   if (!header) return;
 
-  const SHOW_THRESHOLD = -10; // px scrolled before it shows
+  const SHOW_THRESHOLD = -10; // px scrolled before header appears
 
   const updateHeader = () => {
     header.classList.toggle('is-visible', window.scrollY > SHOW_THRESHOLD);
   };
 
-  updateHeader();
+  updateHeader(); // set correct state on load (e.g. reload mid-page)
   window.addEventListener('scroll', updateHeader, { passive: true });
 })();
 
-// Touch swipe, used by the featured carousel and the work gallery
-function addSwipe(el, { enabled = () => true, onStart, onDrag, onSwipe, onCancel }) {
-  const SWIPE_THRESHOLD = 0.15; // fraction of the width
-  const FLICK_SPEED = 0.4;      // px per ms
-  const FLICK_MIN = 30;         // px
-
-  let pointerId = null;
-  let startX = 0;
-  let startY = 0;
-  let startTime = 0;
-  let dragX = 0;
-  let direction = null;
-
-  el.addEventListener('pointerdown', (e) => {
-    // touch only, one finger at a time
-    if (e.pointerType === 'mouse' || pointerId !== null || !enabled()) return;
-    pointerId = e.pointerId;
-    startX = e.clientX;
-    startY = e.clientY;
-    startTime = performance.now();
-    dragX = 0;
-    direction = null;
-    if (onStart) onStart();
-  });
-
-  el.addEventListener('pointermove', (e) => {
-    if (e.pointerId !== pointerId) return;
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-
-    if (!direction) {
-      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
-      direction = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
-      if (direction === 'x') el.setPointerCapture(pointerId);
-    }
-    if (direction !== 'x') return;
-
-    dragX = dx;
-    if (onDrag) onDrag(dragX);
-  });
-
-  el.addEventListener('pointerup', (e) => {
-    if (e.pointerId !== pointerId) return;
-    pointerId = null;
-
-    if (direction === 'x') {
-      const distance = Math.abs(dragX);
-      const speed = distance / Math.max(1, performance.now() - startTime);
-      const farEnough = distance > el.clientWidth * SWIPE_THRESHOLD;
-      const flicked = speed > FLICK_SPEED && distance > FLICK_MIN;
-      if (farEnough || flicked) {
-        onSwipe(dragX < 0 ? 1 : -1);
-        return;
-      }
-    }
-    if (onCancel) onCancel();
-  });
-
-  // browser took over (scrolling or pinch-zoom)
-  el.addEventListener('pointercancel', (e) => {
-    if (e.pointerId !== pointerId) return;
-    pointerId = null;
-    if (onCancel) onCancel();
-  });
-}
-
-// Featured carousel
 document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
   const trackId = controls.getAttribute('data-featured-controls');
   const track = document.getElementById(trackId);
@@ -92,9 +32,8 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
   const dotsWrap = controls.querySelector('.featured-dots');
 
   let index = 0;
-  const AUTOPLAY_DELAY = 4000; // ms
+  const AUTOPLAY_DELAY = 4000; // ms per slide
   let autoplayTimer = null;
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Build dots
   const dots = slides.map((_, i) => {
@@ -131,39 +70,29 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
   };
 
   const restartAutoplay = () => {
-    if (!prefersReducedMotion) startAutoplay();
+    startAutoplay();
   };
 
   nextBtn.addEventListener('click', () => goTo(index + 1, true));
   prevBtn.addEventListener('click', () => goTo(index - 1, true));
 
-  // Swipe
-  addSwipe(track, {
-    enabled: () => slides.length > 1,
-    onStart: stopAutoplay,
-    onDrag: (dx) => {
-      track.classList.add('is-dragging');
-      track.style.transform = `translateX(calc(${-index * 100}% + ${dx}px))`;
-    },
-    onSwipe: (dir) => {
-      track.classList.remove('is-dragging');
-      goTo(index + dir, true);
-    },
-    onCancel: () => {
-      track.classList.remove('is-dragging');
-      render(); // snap back
-      restartAutoplay();
-    },
-  });
-
   render();
 
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!prefersReducedMotion) {
     startAutoplay();
   }
 });
 
-// Embers
+// -------------------------------------------------------------------
+// EMBERS
+// Glowing particles that spark off the seam between Technology and
+// Work below it (the bottom edge of #tech) and rise/scatter up
+// through Technology into the hero-caption section above. Each ember follows a
+// randomized 3-stage zigzag path
+// (rather than a straight line) for a chaotic, fire-like scatter.
+// Skips entirely if the user prefers reduced motion.
+// -------------------------------------------------------------------
 (() => {
   const container = document.getElementById('embers');
   if (!container) return;
@@ -180,11 +109,13 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
     const ember = document.createElement('span');
     ember.className = 'ember';
 
-    const size = rand(1.5, 6.5).toFixed(1);
-    const x = rand(0, 100).toFixed(1);
-    const fall = rand(160, 420).toFixed(0);
+    const size = rand(1.5, 6.5).toFixed(1); // varied spark sizes
+    const x = rand(0, 100).toFixed(1); // spawn position across the seam
+    const fall = rand(160, 420).toFixed(0); // how far it falls before fading out
 
-    // zigzag path
+    // Three independent sideways offsets create a zigzag path instead
+    // of a straight drift, with each ember free to swing a different
+    // direction/amount at each stage.
     const drift1 = rand(-70, 70).toFixed(0);
     const drift2 = rand(-110, 110).toFixed(0);
     const drift3 = rand(-150, 150).toFixed(0);
@@ -193,8 +124,8 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
     const spin2 = rand(-120, 120).toFixed(0);
     const spin3 = rand(-160, 160).toFixed(0);
 
-    const duration = rand(3.5, 11).toFixed(1);
-    const delay = -rand(0, 11).toFixed(1); // negative so they start staggered
+    const duration = rand(3.5, 11).toFixed(1); // varied fall speeds
+    const delay = -rand(0, 11).toFixed(1); // negative = staggered/random start
     const peakOpacity = rand(0.3, 0.85).toFixed(2);
     const ease = EASES[Math.floor(Math.random() * EASES.length)];
 
@@ -216,80 +147,200 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
   }
 
   container.appendChild(frag);
-
-  // Push embers away from the cursor (mouse only)
-  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-
-  const REPEL_RADIUS = 110;  // px
-  const REPEL_STRENGTH = 26; // px
-  const REPEL_EASE = 0.08;   // lower = softer
-
-  const OFF_PAGE = -99999;
-  const particles = Array.from(container.children).map((el) => ({ el, x: 0, y: 0 }));
-  let mouseX = OFF_PAGE;
-  let mouseY = OFF_PAGE;
-  let inView = false;
-  let frame = null;
-
-  const tick = () => {
-    frame = null;
-    if (!inView) return;
-
-    const rects = particles.map((p) => p.el.getBoundingClientRect());
-    let settling = false;
-
-    particles.forEach((p, i) => {
-      const r = rects[i];
-      const cx = r.left + r.width / 2 - p.x;
-      const cy = r.top + r.height / 2 - p.y;
-      const dx = cx - mouseX;
-      const dy = cy - mouseY;
-      const dist = Math.hypot(dx, dy) || 1;
-
-      let targetX = 0;
-      let targetY = 0;
-      if (dist < REPEL_RADIUS) {
-        const force = (1 - dist / REPEL_RADIUS) ** 2 * REPEL_STRENGTH;
-        targetX = (dx / dist) * force;
-        targetY = (dy / dist) * force;
-      }
-
-      p.x += (targetX - p.x) * REPEL_EASE;
-      p.y += (targetY - p.y) * REPEL_EASE;
-      if (Math.abs(p.x) > 0.05 || Math.abs(p.y) > 0.05) settling = true;
-
-      p.el.style.translate = `${p.x.toFixed(2)}px ${p.y.toFixed(2)}px`;
-    });
-
-    if (mouseX !== OFF_PAGE || settling) frame = requestAnimationFrame(tick);
-  };
-
-  const start = () => {
-    if (!frame && inView) frame = requestAnimationFrame(tick);
-  };
-
-  window.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    start();
-  }, { passive: true });
-
-  // cursor left the window
-  window.addEventListener('mouseout', (e) => {
-    if (!e.relatedTarget) {
-      mouseX = OFF_PAGE;
-      mouseY = OFF_PAGE;
-    }
-  });
-
-  // only run while the embers are near the screen
-  new IntersectionObserver(([entry]) => {
-    inView = entry.isIntersecting;
-    start();
-  }, { rootMargin: '450px 0px' }).observe(container);
 })();
 
-// Work gallery
+// -------------------------------------------------------------------
+// WORK CAROUSEL ("Take a closer look")
+// Infinite loop: the real project items are repeated in several sets,
+// the carousel starts on the middle set, and after every slide it
+// silently jumps back to the middle set if it has drifted into the
+// outer ones (the sets look identical, so the jump is invisible).
+//
+// Controls: arrow buttons, keyboard arrows (when the carousel is in
+// view), sideways mouse wheel / trackpad scroll, swipe or drag, and
+// clicking a side project to bring it to the centre. Clicking the
+// centred project opens the lightbox (next section).
+//
+// NOTE: this block must stay ABOVE the lightbox block so the cloned
+// items get their lightbox click handlers.
+// To add a project, just add another <article class="work-item"> in
+// index.html — the carousel picks it up automatically.
+// -------------------------------------------------------------------
+(() => {
+  const carousel = document.getElementById('work-carousel');
+  if (!carousel) return;
+
+  const viewport = carousel.querySelector('.work-viewport');
+  const track = carousel.querySelector('.work-track');
+  const prevBtn = carousel.querySelector('.work-prev');
+  const nextBtn = carousel.querySelector('.work-next');
+
+  const originals = Array.from(track.children);
+  const n = originals.length;
+  if (!n) return;
+
+  // Build the repeated sets. Few projects -> more sets so the screen is always full.
+  const copies = n >= 4 ? 3 : 5;
+  const mid = Math.floor(copies / 2);
+  for (let c = 0; c < copies; c++) {
+    if (c === mid) continue;
+    const frag = document.createDocumentFragment();
+    originals.forEach((el) => {
+      const clone = el.cloneNode(true);
+      clone.setAttribute('aria-hidden', 'true');
+      clone.querySelectorAll('[tabindex]').forEach((t) => t.setAttribute('tabindex', '-1'));
+      frag.appendChild(clone);
+    });
+    if (c < mid) track.insertBefore(frag, track.firstChild);
+    else track.appendChild(frag);
+  }
+
+  const items = Array.from(track.querySelectorAll('.work-item'));
+  const minPos = mid * n;        // first item of the middle set
+  const maxPos = minPos + n - 1; // last item of the middle set
+  let pos = minPos;
+
+  const centre = () => {
+    const el = items[pos];
+    const x = viewport.clientWidth / 2 - (el.offsetLeft + el.offsetWidth / 2);
+    track.style.transform = `translateX(${x}px)`;
+    items.forEach((it, i) => it.classList.toggle('is-active', i === pos));
+  };
+
+  const snap = () => {
+    track.classList.add('no-anim');
+    centre();
+    void track.offsetWidth; // flush so the jump is instant
+    track.classList.remove('no-anim');
+  };
+
+  const wrapPos = () => {
+    while (pos > maxPos) pos -= n;
+    while (pos < minPos) pos += n;
+  };
+
+  const goTo = (p) => {
+    pos = p;
+    centre();
+  };
+  const next = () => goTo(pos + 1);
+  const prev = () => goTo(pos - 1);
+
+  // After sliding, if we've left the middle set, jump back by whole sets.
+  track.addEventListener('transitionend', (e) => {
+    if (e.target !== track || e.propertyName !== 'transform') return;
+    if (pos >= minPos && pos <= maxPos) return;
+    wrapPos();
+    snap();
+  });
+
+  // Reduced motion: no transition runs, so wrap straight away.
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const wrapNow = () => {
+      wrapPos();
+      snap();
+    };
+    nextBtn.addEventListener('click', wrapNow);
+    prevBtn.addEventListener('click', wrapNow);
+  }
+
+  nextBtn.addEventListener('click', next);
+  prevBtn.addEventListener('click', prev);
+
+  // ---- keyboard (only while the carousel is on screen) ----
+  let inView = false;
+  new IntersectionObserver((entries) => {
+    inView = entries[0].isIntersecting;
+  }, { threshold: 0.4 }).observe(carousel);
+
+  document.addEventListener('keydown', (e) => {
+    if (!inView) return;
+    if (document.getElementById('lightbox')?.classList.contains('active')) return;
+    if (document.getElementById('service-modal')?.classList.contains('active')) return;
+    if (e.key === 'ArrowRight') next();
+    if (e.key === 'ArrowLeft') prev();
+  });
+
+  // ---- sideways wheel / trackpad ----
+  let wheelLock = false;
+  viewport.addEventListener('wheel', (e) => {
+    if (Math.abs(e.deltaX) <= Math.abs(e.deltaY) || Math.abs(e.deltaX) < 20) return;
+    e.preventDefault();
+    if (wheelLock) return;
+    wheelLock = true;
+    e.deltaX > 0 ? next() : prev();
+    setTimeout(() => { wheelLock = false; }, 450);
+  }, { passive: false });
+
+  // ---- swipe / drag ----
+  let startX = null;
+  let dragged = false;
+
+  viewport.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    startX = e.clientX;
+    dragged = false;
+  });
+
+  viewport.addEventListener('pointermove', (e) => {
+    if (startX === null) return;
+    if (Math.abs(e.clientX - startX) > 8) viewport.classList.add('is-dragging');
+  });
+
+  const endDrag = (e) => {
+    if (startX === null) return;
+    const dx = e.clientX - startX;
+    startX = null;
+    viewport.classList.remove('is-dragging');
+    if (Math.abs(dx) > 50) {
+      dragged = true; // swallow the click that follows a drag
+      dx < 0 ? next() : prev();
+    }
+  };
+  viewport.addEventListener('pointerup', endDrag);
+  viewport.addEventListener('pointercancel', endDrag);
+  viewport.addEventListener('pointerleave', endDrag);
+
+  // ---- clicks: side items centre first, centre item opens the lightbox ----
+  // Capture phase so we run before the lightbox handlers below.
+  const intercept = (e) => {
+    if (dragged) {
+      e.stopPropagation();
+      e.preventDefault();
+      dragged = false;
+      return;
+    }
+    const item = e.target.closest('.work-item');
+    if (!item) return;
+    const i = items.indexOf(item);
+    if (i !== -1 && i !== pos) {
+      e.stopPropagation();
+      e.preventDefault();
+      goTo(i);
+    }
+  };
+  track.addEventListener('click', intercept, true);
+  track.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') intercept(e);
+  }, true);
+
+  // ---- keep centred on resize / once images have loaded ----
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(snap, 100);
+  });
+  window.addEventListener('load', snap);
+
+  snap();
+})();
+
+// -------------------------------------------------------------------
+// WORK GRID LIGHTBOX
+// Clicking a work item enlarges its image. Each item can carry its own
+// small set of extra images (via data-images on the .work-item), which
+// are only reachable by clicking through the lightbox's prev/next/dots.
+// -------------------------------------------------------------------
 (() => {
   const lightbox = document.getElementById('lightbox');
   if (!lightbox) return;
@@ -364,21 +415,24 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
     const cover = item.querySelector('.card-media');
     if (!cover) return;
 
+    // The whole fanned stack is clickable (falls back to the cover image).
     const trigger = item.querySelector('.work-stack') || cover;
 
+    // All images for this project live in data-images; they are only
+    // revealed once the lightbox is open.
     const raw = item.getAttribute('data-images');
     const images = raw
       ? raw.split(',').map((s) => s.trim()).filter(Boolean)
       : [cover.getAttribute('src')];
     const title = item.querySelector('h3')?.textContent.trim() || '';
 
-    // image count
+    // Image count under the title, worked out automatically.
     const countEl = item.querySelector('.work-count');
     if (countEl) {
       countEl.textContent = `${images.length} image${images.length === 1 ? '' : 's'}`;
     }
 
-    // fanned images behind the cover
+    // Fill the two fanned layers behind the cover with the next two images.
     const toUrl = (src) => `url("${new URL(src, document.baseURI).href}")`;
     if (images[1]) trigger.style.setProperty('--back-1', toUrl(images[1]));
     if (images[2]) trigger.style.setProperty('--back-2', toUrl(images[2]));
@@ -397,45 +451,6 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
   prevBtn.addEventListener('click', showPrev);
   closeBtn.addEventListener('click', closeLightbox);
 
-  // Swipe
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let swipeCount = 0;
-
-  addSwipe(lightbox, {
-    enabled: () => lightbox.classList.contains('active') && currentImages.length > 1,
-    onDrag: (dx) => {
-      media.style.transition = 'none';
-      media.style.transform = `translateX(${dx}px)`;
-    },
-    onSwipe: (dir) => {
-      const thisSwipe = ++swipeCount;
-      media.style.transition = 'none';
-      media.style.transform = '';
-      if (!reduceMotion) media.style.opacity = '0';
-
-      if (dir > 0) showNext(); else showPrev();
-      if (reduceMotion) return;
-
-      // fade the new image in once it's loaded
-      const reveal = () => {
-        if (thisSwipe !== swipeCount) return;
-        media.style.opacity = '';
-        media.animate(
-          [
-            { transform: `translateX(${dir * 60}px)`, opacity: 0 },
-            { transform: 'none', opacity: 1 },
-          ],
-          { duration: 250, easing: 'ease-out' }
-        );
-      };
-      media.decode().then(reveal, reveal);
-    },
-    onCancel: () => {
-      media.style.transition = reduceMotion ? 'none' : 'transform 0.25s ease';
-      media.style.transform = ''; // snap back
-    },
-  });
-
   lightbox.addEventListener('click', (e) => {
     if (e.target === lightbox) closeLightbox();
   });
@@ -448,7 +463,12 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
   });
 })();
 
-// Contact form (Web3Forms)
+// -------------------------------------------------------------------
+// CONTACT FORM (Web3Forms)
+// Sends the message without leaving the page, then swaps the form for
+// a thank-you line. If anything fails, visitors are pointed to the
+// studio email instead.
+// -------------------------------------------------------------------
 (() => {
   const form = document.getElementById('contact-form');
   if (!form) return;
@@ -493,7 +513,12 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
   });
 })();
 
-// Service popup
+// -------------------------------------------------------------------
+// SERVICE POPUP
+// Clicking (or pressing Enter on) a service card opens a box with its
+// image, title and the longer description from its .service-detail.
+// Close with the X, by clicking outside the box, or with Escape.
+// -------------------------------------------------------------------
 (() => {
   const modal = document.getElementById('service-modal');
   if (!modal) return;
@@ -514,6 +539,7 @@ document.querySelectorAll('[data-featured-controls]').forEach((controls) => {
     numEl.textContent = card.querySelector('.service-num')?.textContent || '';
     titleEl.textContent = card.querySelector('h3')?.textContent || '';
 
+    // Long description if there is one, otherwise the card's short text
     const detail = card.querySelector('.service-detail');
     if (detail) {
       textEl.innerHTML = detail.innerHTML;

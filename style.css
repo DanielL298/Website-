@@ -1,4 +1,6 @@
-/* Variables */
+/*
+   TOKENS — edit these to reskin the whole page
+ */
 :root {
   --color-bg: #0d0d0d;
   --color-bg-alt: #000000;
@@ -10,6 +12,8 @@
   --font-display: "Helvetica Neue", Arial, sans-serif;
   --font-body: "Helvetica Neue", Arial, sans-serif;
 
+  /* page content caps out at a comfortable reading width,
+     even on very large / 4K monitors */
   --wrap-max: 1440px;
   --gutter: clamp(20px, 4vw, 64px);
 
@@ -26,7 +30,11 @@ body {
   color: var(--color-text);
   background: var(--color-bg);
   line-height: 1.5;
-  font-size: clamp(16px, 1vw, 18px);
+  font-size: clamp(16px, 1vw, 18px); /* scales gently on huge screens */
+  /* Clips any stray horizontal overflow (e.g. an ember drifting past the
+     right edge — #tech intentionally doesn't clip so they can rise into
+     hero-caption) so the page never gains extra un-textured scroll space
+     past the edge of the contours background. */
   overflow-x: hidden;
 }
 
@@ -43,7 +51,9 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
   padding-right: var(--gutter);
 }
 
-/* Header */
+/* 
+   HEADER
+ */
 .site-header {
   position: fixed;
   top: 0;
@@ -70,8 +80,8 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
 
 .logo {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    align-items: center;  /* Vertically aligns the image and text */
+    gap: 10px;            /* Space between them */
     text-decoration: none;
     color: white;
 }
@@ -101,7 +111,20 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
 .nav a:hover, .nav a:focus-visible {
   color: var(--color-text);
   border-color: #e53935;
-  /* contours texture */
+
+  /* Contours snippet — NOTE: no background-attachment:fixed here.
+     The header this lives in is animated with a transform (to slide
+     in/out), and any transformed ancestor turns "fixed" backgrounds
+     into a buggy, jumpy mess (the transform creates a new containing
+     block, so "fixed" stops meaning "relative to the viewport"). Using
+     the default (scroll) attachment keeps it stable — every link still
+     shows the same crop of the texture, it just won't shift with the
+     page scroll position.
+
+     background-size is a large percentage (not "cover") so the image
+     is blown up well past the button's size — cover was scaling the
+     image down to just barely fit, which showed almost the entire
+     graphic rather than a cropped section of it. */
   background-image:
     linear-gradient(rgba(13, 13, 13, 0.55), rgba(13, 13, 13, 0.55)),
     url('images/contours.webp');
@@ -109,7 +132,10 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
   background-position: center;
 }
 
-/* Title images */
+/* 
+   MOTTO / HERO CAPTION (sits in normal flow directly under the
+   full-screen carousel, rather than overlaid on top of it)
+ */
 .hero-caption {
   padding: clamp(40px, 6vw, 80px) 0;
 }
@@ -121,7 +147,21 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
   margin: 0 auto;
 }
 
-/* Embers */
+/*
+   EMBERS — glowing particles that originate right at the seam between
+   Technology and Work below it (i.e. the bottom edge of #tech), then
+   drift up and fade as they rise through Technology into the hero/quote
+   section above — as if sparking off that seam and floating upward.
+   Particles are generated in JS (randomized size/speed/position/path)
+   and animated purely with CSS for performance. Each ember follows a
+   3-stage zigzag path (drift1 -> drift2 -> drift3) instead of a
+   straight line, plus randomized rotation, for a chaotic scatter
+   rather than a uniform rise.
+
+   Note: unlike a normal contained effect, #tech deliberately does NOT
+   clip overflow, so embers are free to travel above its own box and
+   visually pass into the hero-caption/quote section that precedes it.
+ */
 #tech {
   position: relative;
 }
@@ -131,7 +171,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
   z-index: 1;
 }
 
-/* glow along the bottom edge */
+/* Soft glow strip marking the seam the embers spark off from */
 #tech::before {
   content: "";
   position: absolute;
@@ -153,9 +193,7 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  /* clip sideways only, stops the page widening on phones */
-  overflow-x: clip;
-  overflow-y: visible;
+  overflow: visible;
 }
 
 .ember {
@@ -221,7 +259,9 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
   color: var(--color-text-muted);
 }
 
-/* Sections */
+/*
+   GENERIC SECTION
+ */
 .section {
   padding: clamp(48px, 7vw, 96px) 0;
 }
@@ -256,36 +296,37 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
 
 .section-head h2 { margin-bottom: 0; }
 
-/* Featured carousel */
+/* 
+   FEATURED WORK (full-screen auto-playing slide)
+ */
 .featured {
-  --spot-x: 50%;
-  --spot-y: 50%;
   position: relative;
   height: 100vh;
   min-height: 480px;
   overflow: hidden;
-  background-color: var(--color-bg);
+  background-color: var(--color-bg-alt);
   background-image:
-    linear-gradient(to bottom, #0d0d0d 0, rgba(13, 13, 13, 0) 20%, rgba(13, 13, 13, 0) 80%, #0d0d0d 100%),
-    radial-gradient(ellipse 58% 60% at var(--spot-x) var(--spot-y), rgba(13, 13, 13, 0) 0%, rgba(13, 13, 13, 0.35) 40%, rgba(13, 13, 13, 0.9) 80%, #0d0d0d 100%),
+    linear-gradient(
+      to bottom,
+      rgba(13, 13, 13, 0.92) 0,
+      rgba(26, 26, 26, 0.45) 60px,
+      rgba(26, 26, 26, 0.45) calc(100% - 60px),
+      rgba(13, 13, 13, 0.92) 100%
+    ),
     url('images/contours.webp');
-  background-size: 100% calc(100% + 2px), 100% calc(100% + 2px), cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background-size: 100% 100%, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    inset 0 0 90px rgba(255, 255, 255, 0.10);
 }
 
 .featured-track {
   display: flex;
   height: 100%;
   transition: transform 0.6s ease;
-  touch-action: pan-y pinch-zoom; /* sideways swipes handled in JS */
-  user-select: none;
-  -webkit-user-select: none;
 }
-
-.featured-track.is-dragging { transition: none; }
-
-.featured-media { -webkit-user-drag: none; }
 
 .featured-slide {
   position: relative;
@@ -352,63 +393,9 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
   border-color: var(--color-text);
 }
 
-/* Featured carousel on phones: full image, caption and controls underneath */
-@media (max-width: 720px) {
-  .featured {
-    --spot-y: 55%;
-    height: auto;
-    min-height: 100vh; /* fallback */
-    min-height: 100svh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding-top: 72px; /* header height */
-  }
-
-  .featured-track {
-    height: auto;
-    align-items: flex-start;
-  }
-
-  .featured-slide { height: auto; }
-
-  .featured .featured-media {
-    height: auto;
-    aspect-ratio: auto;
-    object-fit: contain;
-  }
-
-  .featured-caption {
-    position: static;
-    margin: 16px var(--gutter) 0;
-    padding: 0;
-    background: none;
-  }
-
-  .featured-caption h3 { font-size: 1.15rem; }
-
-  .featured-controls {
-    position: static;
-    padding: 12px 0 24px;
-  }
-
-  /* bigger tap area for the dots */
-  .featured-controls .featured-dots { gap: 16px; }
-
-  .featured-controls .featured-dots .dot { position: relative; }
-
-  .featured-controls .featured-dots .dot::before {
-    content: "";
-    position: absolute;
-    inset: -8px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .featured-track { transition: none; }
-}
-
-/* Card media */
+/*
+   CARD MEDIA / PLACEHOLDER (shared)
+ */
 .card-media {
   aspect-ratio: 4 / 3;
   border-radius: var(--radius);
@@ -417,6 +404,8 @@ h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.1; }
 
 .card-media.square { aspect-ratio: 1 / 1; }
 
+/* Once a placeholder div is swapped for a real <img class="card-media">,
+   this makes it fill the box and crop nicely instead of stretching. */
 img.card-media,
 .lightbox-media img {
   width: 100%;
@@ -427,12 +416,14 @@ img.card-media,
 
 .card-media2.square { aspect-ratio: 1 / 1; }
 
+/* Once a placeholder div is swapped for a real <img class="card-media">,
+   this makes it fill the box and crop nicely instead of stretching. */
 img.card-media2,
 .lightbox-media img {
   width: 150%;
   height: 100%;
-  object-fit: contain;
-  display: block;
+  object-fit: contain; 
+  display: block; 
 }
 
 .placeholder {
@@ -447,20 +438,105 @@ img.card-media2,
   text-transform: uppercase;
 }
 
-/* Work stacks */
-.work-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
-  gap: clamp(32px, 4vw, 72px);
-  max-width: 1100px;
-  margin: 32px auto 0;
+/*
+   WORK CAROUSEL ("Take a closer look")
+   Full-width looping carousel of fanned image stacks (click one to open
+   the lightbox). The centred project is full size, the ones either side
+   shrink/dim and run off the edges of the screen. The JS in index.js
+   repeats the items in sets so it can wrap round forever.
+ */
+.work-carousel {
+  position: relative;
+  width: 100%;
+  margin: 32px 0 0;
 }
+
+.work-viewport {
+  overflow: hidden;
+  /* room above/below so hover-zoomed items aren't clipped */
+  padding: 56px 0;
+  /* fade the far edges so items look like they carry on past the screen */
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 10%, #000 90%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 10%, #000 90%, transparent 100%);
+  touch-action: pan-y; /* vertical page scroll still works, horizontal swipes are ours */
+  cursor: grab;
+}
+
+.work-viewport.is-dragging { cursor: grabbing; }
+
+.work-track {
+  position: relative; /* offsetLeft of items is measured from here */
+  display: flex;
+  width: max-content;
+  gap: clamp(24px, 3vw, 56px);
+  transition: transform 0.65s cubic-bezier(0.45, 0.05, 0.2, 1);
+  will-change: transform;
+}
+
+.work-track.no-anim { transition: none; }
 
 .work-item {
   position: relative;
+  flex: 0 0 auto;
+  width: clamp(320px, 52vw, 800px);
   text-align: center;
+  opacity: 0.8;
+  transform: scale(0.8);
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  z-index: 1;
 }
 
+.work-item.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* hover: everything grows a touch, side items wake up */
+.work-item:hover {
+  z-index: 3;
+  opacity: 1;
+  transform: scale(0.92);
+}
+
+.work-item.is-active:hover {
+  transform: scale(1.1);
+}
+
+.work-item:not(.is-active) .work-stack { cursor: pointer; }
+
+.work-item img { -webkit-user-drag: none; user-select: none; }
+
+/* arrows (not positioned with transform: .ctrl:hover already uses it) */
+.work-arrow {
+  position: absolute;
+  top: calc(50% - 26px);
+  width: 52px;
+  height: 52px;
+  z-index: 5;
+  background: rgba(13, 13, 13, 0.6);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+.work-arrow svg { width: 26px; height: 26px; }
+
+.work-prev { left: clamp(8px, 2vw, 40px); }
+.work-next { right: clamp(8px, 2vw, 40px); }
+
+@media (max-width: 720px) {
+  .work-item { width: 72vw; }
+  .work-arrow { width: 40px; height: 40px; top: calc(50% - 20px); }
+  .work-arrow svg { width: 20px; height: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .work-track,
+  .work-item { transition: none; }
+}
+
+/*
+   WORK STACKS (fanned images, click to open the lightbox)
+ */
 .work-stack {
   position: relative;
   z-index: 1;
@@ -468,7 +544,7 @@ img.card-media2,
   cursor: zoom-in;
 }
 
-/* cover image */
+/* the front image (your real cover photo) */
 .work-stack .card-media {
   position: absolute;
   inset: 0;
@@ -491,7 +567,7 @@ img.card-media2,
   .work-stack:focus-visible .card-media { transform: none; }
 }
 
-/* fanned images behind the cover (set in index.js) */
+/* the two fanned layers behind it (filled with the next two images by index.js) */
 .work-stack::before,
 .work-stack::after {
   content: "";
@@ -520,7 +596,7 @@ img.card-media2,
   transform: rotate(4deg) translateX(12px);
 }
 
-/* mirror every second stack */
+/* mirror the fan on every second project */
 .work-item:nth-child(even) .work-stack::before { transform: rotate(5deg) translateX(14px); }
 .work-item:nth-child(even) .work-stack::after  { transform: rotate(-4deg) translateX(-12px); }
 
@@ -541,7 +617,11 @@ img.card-media2,
   font-size: 0.9rem;
 }
 
-/* Work section background */
+/*
+   WORK SECTION BACKGROUND
+   Spotlight: the contour texture is brightest behind the projects and
+   fades to the page colour toward every edge (no hard top/bottom cut)
+ */
 #all-work {
   position: relative;
   background-color: #0d0d0d;
@@ -549,12 +629,22 @@ img.card-media2,
     linear-gradient(to bottom, #0d0d0d 0, rgba(13, 13, 13, 0) 20%, rgba(13, 13, 13, 0) 80%, #0d0d0d 100%),
     radial-gradient(ellipse 58% 60% at 50% 58%, rgba(13, 13, 13, 0) 0%, rgba(13, 13, 13, 0.35) 40%, rgba(13, 13, 13, 0.9) 80%, #0d0d0d 100%),
     url('images/contours.webp');
+  /* The two fade layers overhang the section by 1px top and bottom. Without
+     this, on scaled displays (e.g. Windows at 125-175%) they can round a
+     pixel short and leave a thin line of unfaded contours at the edge. */
   background-size: 100% calc(100% + 2px), 100% calc(100% + 2px), cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
-/* Seam graphic */
+/*
+   SEAM GRAPHIC
+   Sits just below the line between Technology and this section.
+   Save the beam as images/seam-beam.png and it replaces the dashed
+   placeholder automatically (its own proportions are kept).
+     --seam-graphic-offset : push it further down (e.g. 20px)
+     --seam-graphic-width  : make it narrower than the full page (e.g. 80%)
+ */
 .seam-graphic {
   position: absolute;
   top: 0;
@@ -573,7 +663,7 @@ img.card-media2,
   object-fit: fill;
 }
 
-/* placeholder until the image loads */
+/* placeholder look, only while no image has loaded */
 .seam-graphic:not(.has-image) {
   height: clamp(48px, 6vw, 96px);
   display: flex;
@@ -589,7 +679,7 @@ img.card-media2,
 
 .seam-graphic.has-image span { display: none; }
 
-/* Beam divider */
+/* BEAM DIVIDER */
 .beam-divider {
   width: 100%;
   height: clamp(55px, 6vw, 90px);
@@ -611,7 +701,9 @@ img.card-media2,
   z-index: 1;
 }
 
-/* Lightbox */
+/* 
+   LIGHTBOX
+ */
 .lightbox {
   position: fixed;
   inset: 0;
@@ -630,14 +722,6 @@ img.card-media2,
   opacity: 1;
   pointer-events: auto;
 }
-
-#lightbox {
-  touch-action: pan-y pinch-zoom;
-  user-select: none;
-  -webkit-user-select: none;
-}
-
-#lightbox .lightbox-media { -webkit-user-drag: none; }
 
 .lightbox-content {
   max-width: 100%;
@@ -679,7 +763,9 @@ img.card-media2,
 
 .lightbox-close:hover { background: var(--color-border); }
 
-/* Work gallery */
+/* 
+   WORK LIGHTBOX (per-item image gallery)
+*/
 .lightbox-media {
   width: 100%;
   font-size: 1.1rem;
@@ -707,6 +793,7 @@ img.card-media2,
   gap: 20px;
 }
 
+/* No circular button chrome for the lightbox close/prev/next controls */
 .lightbox-close,
 .lightbox-prev,
 .lightbox-next {
@@ -722,7 +809,9 @@ img.card-media2,
   opacity: 0.65;
 }
 
-/* Arrow buttons */
+/* 
+   SHARED CONTROLS (buttons used by featured slider)
+ */
 .ctrl {
   width: 44px;
   height: 44px;
@@ -749,7 +838,9 @@ img.card-media2,
   transition: filter 0.25s ease;
 }
 
-/* ember glow on hover */
+/* Ember-orange glow flare on hover/focus — matches the .ember particle
+   colour (#ff8a3d) instead of a solid filled button, so the controls
+   read as "sparking" rather than boxy UI chrome. */
 .ctrl:hover,
 .ctrl:focus-visible {
   color: #ffb17a;
@@ -766,7 +857,9 @@ img.card-media2,
   outline-offset: 4px;
 }
 
-/* Logo grid */
+/*
+   LOGO GRID
+ */
 .logo-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -788,6 +881,8 @@ img.card-media2,
   overflow: hidden;
 }
 
+/* Logos are shown whole (not cropped) — swap in real logo files any size,
+   they'll scale down to fit the box. */
 .logo-item img {
   max-width: 70%;
   max-height: 70%;
@@ -796,7 +891,9 @@ img.card-media2,
   object-fit: contain;
 }
 
-/* plain version, no tiles */
+/* Plain variant — no grid lines, no tile backgrounds. Just drop in
+   transparent (PNG/SVG) logo files and they'll sit directly on the
+   page background, evenly spaced. */
 .logo-grid--plain {
   background: none;
   border: none;
@@ -820,7 +917,9 @@ img.card-media2,
   opacity: 1;
 }*/
 
-/* Service cards */
+/*
+   SERVICE CARDS (2 x 2, full width, pop on hover)
+ */
 .service-cards {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -835,13 +934,14 @@ img.card-media2,
   border-radius: var(--radius);
   box-shadow: 0 0 8px rgba(255, 40, 40, 0.2);
   overflow: hidden;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
 .service-card:hover,
 .service-card:focus-visible {
+  transform: translateY(-8px) scale(1.02);
   border-color: rgba(255, 90, 90, 0.9);
-  box-shadow: 0 0 16px rgba(255, 40, 40, 0.35);
+  z-index: 2;
   outline: none;
 }
 
@@ -853,13 +953,13 @@ img.card-media2,
 .service-media img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: contain; /* whole image shows inside the box, no cropping */
   transition: transform 0.5s ease;
 }
 
 .service-card:hover .service-media img,
 .service-card:focus-visible .service-media img {
-  transform: scale(1.08);
+  transform: scale(1.06);
 }
 
 .service-body {
@@ -898,11 +998,15 @@ img.card-media2,
 @media (prefers-reduced-motion: reduce) {
   .service-card,
   .service-media img { transition: none; }
-  .service-card:hover .service-media img,
-  .service-card:focus-visible .service-media img { transform: none; }
+  .service-card:hover,
+  .service-card:focus-visible { transform: none; }
 }
 
-/* Service popup */
+/*
+   SERVICE POPUP — click a service card to open it. Reuses the work
+   lightbox's dark overlay and close button; the box is styled like
+   the red-edged service cards, with the description in red.
+ */
 .service-card { cursor: pointer; }
 
 .service-more {
@@ -929,6 +1033,7 @@ img.card-media2,
 .service-card:hover .service-more svg,
 .service-card:focus-visible .service-more svg { transform: translateX(4px); }
 
+/* hidden while closed so its close button can't be tabbed to */
 .service-modal {
   visibility: hidden;
   transition: opacity 0.2s ease, visibility 0.2s ease;
@@ -936,7 +1041,7 @@ img.card-media2,
 
 .service-modal.active {
   visibility: visible;
-  transition: opacity 0.2s ease, visibility 0s;
+  transition: opacity 0.2s ease, visibility 0s; /* show straight away so the close button can take focus */
 }
 
 .service-modal-box {
@@ -971,13 +1076,14 @@ img.card-media2,
 
 .service-modal-text p {
   margin: 0 0 14px;
-  color: #ff5a52;
+  color: #ff5a52; /* the red description text */
   font-size: 1.05rem;
   line-height: 1.7;
 }
 
 .service-modal-text p:last-child { margin-bottom: 0; }
 
+/* Phones: leave room above the box for the close button */
 @media (max-width: 720px) {
   .service-modal { padding: 76px 16px 24px; }
 }
@@ -988,12 +1094,9 @@ img.card-media2,
   .service-modal-box { transform: none; }
 }
 
-/* Values */
-#values .section-head {
-  justify-content: center;
-  align-items: center;
-}
-
+/*
+   VALUES GRID
+ */
 .values-grid {
   display: flex;
   flex-direction: column;
@@ -1041,7 +1144,9 @@ img.card-media2,
   .value-item { animation: none; }
 }
 
-/* Team */
+/*
+   TEAM CARDS (red box per member, photo breaks out on the left, no hover effects)
+ */
 .team-list {
   --photo-w: clamp(150px, 16vw, 260px);
   width: 60%;
@@ -1061,6 +1166,7 @@ img.card-media2,
   align-items: center;
 }
 
+/* The frame — keeps its size and clips the photo inside it */
 .team-photo {
   position: absolute;
   top: -28px;
@@ -1073,7 +1179,7 @@ img.card-media2,
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
-/* --zoom and --focus can be set on .team-photo to crop in */
+/* The photo — set --zoom / --focus on a .team-photo to crop in closer */
 .team-photo img {
   width: 100%;
   height: 100%;
@@ -1118,6 +1224,7 @@ img.card-media2,
   border-radius: var(--radius);
 }
 
+/* Email + ArtStation buttons sit side by side, wrapping on small screens */
 .team-links {
   display: flex;
   flex-wrap: wrap;
@@ -1127,7 +1234,7 @@ img.card-media2,
 .team-link {
   display: inline-flex;
   max-width: 100%;
-  overflow-wrap: anywhere;
+  overflow-wrap: anywhere; /* long email addresses can wrap on phones */
   align-items: center;
   gap: 8px;
   padding: 8px 14px;
@@ -1147,11 +1254,13 @@ img.card-media2,
   stroke-linejoin: round;
 }
 
+/* keyboard focus only (no hover effects) */
 .team-link:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 3px;
 }
 
+/* Phones: one column, photo still pokes out of the top-left corner */
 @media (max-width: 720px) {
   .team-list {
     width: calc(100% - 2 * var(--gutter));
@@ -1173,7 +1282,10 @@ img.card-media2,
   }
 }
 
-/* Contact */
+/* 
+   CONTACT
+ */
+/* everything in Get in touch is centred */
 .contact-info {
   text-align: center;
 }
@@ -1221,12 +1333,13 @@ img.card-media2,
   font-size: 0.75rem;
   color: var(--color-text-muted);
 }
-
-/* Contact form */
+/*
+   CONTACT FORM (Web3Forms) — red-edged fields to match the service/value cards
+ */
 .contact-form {
   margin: 40px auto 0;
   max-width: 680px;
-  text-align: left;
+  text-align: left; /* field labels stay left-aligned above their boxes */
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -1310,14 +1423,13 @@ img.card-media2,
 .contact-status.is-success { color: #fff; font-size: 1.1rem; }
 .contact-status.is-error { color: #ff8a80; }
 
-/* hide the form once it's sent */
+/* Once sent, only the thank-you message is left showing */
 .contact-form.is-sent > :not(.contact-status) { display: none; }
 
 @media (max-width: 720px) {
   .contact-form-row { grid-template-columns: 1fr; }
 }
 
-/* Footer */
 .site-footer {
   border-top: 1px solid var(--color-border);
   padding: 32px 0;
@@ -1333,13 +1445,15 @@ img.card-media2,
   color: var(--color-text-muted);
 }
 
-/* Responsive */
+/* 
+   RESPONSIVE
+ */
 @media (max-width: 720px) {
-  .nav { display: none; } /* TODO: mobile menu */
+  .nav { display: none; } /* swap for a mobile menu when ready */
   .section-head { flex-direction: column; align-items: flex-start; gap: 16px; }
 }
 
-/* Reduced motion */
+/* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .ctrl { transition: none; }
